@@ -58,4 +58,4 @@ window.quizConfig.questions.push(
     {ch: 3, q: "日本国憲法の前文で保障されている、全世界の国民が恐怖と欠乏から免かれ、平和のうちに生存する権利を何と言いますか。", a: ["平和的生存権", "へいわてきせいぞんけん"]}
 );
 
-window.quizSubjects.push(publicSubject3);
+window.quizSubjects.push(publicSubject);
