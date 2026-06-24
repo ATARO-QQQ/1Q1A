@@ -124,7 +124,6 @@
                     </button>
                 </form>
                 
-                <!-- スキップ・ギブアップボタンを追加 -->
                 <div class="mt-4 flex justify-end gap-6">
                     <button type="button" onclick="skipQuestion()" class="text-sm text-gray-400 hover:text-black transition-colors">
                         スキップ
@@ -183,7 +182,8 @@
             currentSubject: null,
             currentChapter: null,
             questions: [],
-            currentIndex: 0,
+            remainingQuestions: [], 
+            currentQuestion: null, 
             score: 0,
             wrongScore: 0,
             mistakes: [],
@@ -295,7 +295,7 @@
         }
 
         function startQuizProcess() {
-            appState.currentIndex = 0;
+            appState.remainingQuestions = [...appState.questions]; 
             appState.score = 0;
             appState.wrongScore = 0;
             appState.mistakes = [];
@@ -317,9 +317,11 @@
 
         function renderQuestion() {
             appState.isAnswered = false;
-            const q = appState.questions[appState.currentIndex];
+            appState.currentQuestion = appState.remainingQuestions[0]; 
+            const q = appState.currentQuestion;
             
-            document.getElementById('q-current').innerText = appState.currentIndex + 1;
+            const currentNum = appState.questions.length - appState.remainingQuestions.length + 1;
+            document.getElementById('q-current').innerText = currentNum;
             document.getElementById('question-text').innerText = q.q;
             
             const inputEl = document.getElementById('answer-input');
@@ -350,13 +352,12 @@
             
             document.getElementById('input-area').classList.add('hidden');
             
-            const currentQ = appState.questions[appState.currentIndex];
+            const currentQ = appState.currentQuestion;
             const isCorrect = checkCorrectness(userInput, currentQ.a);
 
             showFeedback(isCorrect, currentQ);
         }
 
-        // ギブアップ処理を追加
         function giveUpQuestion() {
             if (appState.isAnswered) return;
             appState.isAnswered = true;
@@ -365,19 +366,19 @@
             document.getElementById('submit-btn').disabled = true;
             document.getElementById('input-area').classList.add('hidden');
             
-            const currentQ = appState.questions[appState.currentIndex];
+            const currentQ = appState.currentQuestion;
             
-            // フィードバック画面で「ギブアップ」として不正解扱いにする
             showFeedback('giveup', currentQ);
         }
 
-        // スキップ処理を追加
         function skipQuestion() {
             if (appState.isAnswered) return;
             appState.isAnswered = true;
             
-            // スコアにはカウントせず、すぐ次の問題へ
-            nextQuestion();
+            const skipped = appState.remainingQuestions.shift();
+            appState.remainingQuestions.push(skipped);
+            
+            renderQuestion();
         }
 
         function checkCorrectness(input, answers) {
@@ -408,7 +409,6 @@
                 title.innerText = '× 不正解';
                 title.className = 'text-xl font-bold mb-2 text-gray-500';
             } else if (status === 'giveup') {
-                // ギブアップの場合は専用の表示にしつつ、内部データは不正解として扱う
                 appState.wrongScore++;
                 appState.mistakes.push(questionData);
                 title.innerText = '🏳 ギブアップ';
@@ -419,8 +419,9 @@
         }
 
         function nextQuestion() {
-            appState.currentIndex++;
-            if (appState.currentIndex < appState.questions.length) {
+            appState.remainingQuestions.shift();
+            
+            if (appState.remainingQuestions.length > 0) {
                 renderQuestion();
             } else {
                 showResult();
