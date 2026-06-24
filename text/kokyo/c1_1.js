@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 1, q: "現代社会において、科学技術の発展がもたらす未知の危険性（環境問題や原発事故など）と隣り合わせになっている社会を何社会と言いますか。", a: ["リスク社会", "りすくしゃかい"]}
 );
 
-window.quizSubjects.push(publicSubject1);
+window.quizSubjects.push(publicSubject);
