@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一問一答</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'BIZ UDPGothic', sans-serif;
+            background-color: #fafafa;
+            color: #111;
+            min-height: 100vh;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-line {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #000;
+            border-radius: 0;
+            padding: 8px 4px;
+            font-size: 1.25rem;
+            width: 100%;
+            outline: none;
+            transition: border-width 0.2s;
+        }
+        .input-line:focus {
+            border-bottom-width: 2px;
+        }
+
+        .btn-simple {
+            border: 1px solid #000;
+            background-color: #fff;
+            color: #000;
+            transition: all 0.2s;
+        }
+        .btn-simple:hover:not(:disabled) {
+            background-color: #000;
+            color: #fff;
+        }
+        .btn-simple:disabled {
+            border-color: #ccc;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+
+    <script src="geography.js"></script>
+</head>
+<body class="p-4 md:p-8 flex justify-center items-start">
+
+    <div class="w-full max-w-2xl mt-4 bg-white border border-gray-300 p-8 md:p-12 shadow-sm">
+        
+        <!-- ヘッダー -->
+        <div class="border-b border-black mb-8 pb-4 flex justify-between items-end">
+            <h1 class="text-2xl font-bold tracking-widest">一問一答</h1>
+        </div>
+
+        <div id="screen-home" class="screen active">
+            <h2 class="text-lg mb-6 font-bold border-l-4 border-black pl-3">教科選択</h2>
+            
+            <div id="subject-list" class="space-y-4">
+            </div>
+
+            <div id="no-data-msg" class="hidden mt-8 p-6 border border-gray-200 text-center text-sm">
+                <p>クイズデータが見つかりません。</p>
+                <p class="mt-2 text-gray-500">外部JSファイルを読み込んでください。</p>
+            </div>
+        </div>
+
+        <div id="screen-subject" class="screen">
+            <button onclick="navigate('home')" class="mb-6 text-sm text-gray-500 hover:text-black">&lt; ホームへ戻る</button>
+            
+            <h2 id="subject-title" class="text-2xl font-bold mb-8">教科名</h2>
+            
+            <div class="mb-10">
+                <h3 class="font-bold mb-4 border-l-4 border-black pl-3">単元選択</h3>
+                <div id="chapter-list" class="space-y-3">
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <button onclick="startRemix()" class="btn-simple px-6 py-3 font-bold w-full md:w-auto">
+                    全問ランダムに出題
+                </button>
+            </div>
+        </div>
+        <div id="screen-quiz" class="screen">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 pb-2 border-b border-gray-200 text-sm">
+                <div class="font-bold mb-2 md:mb-0" id="quiz-chapter-name">単元名</div>
+                <div class="flex gap-4">
+                    <span>進行: <span class="font-bold text-lg"><span id="q-current">1</span>/<span id="q-total">10</span></span></span>
+                    <span>正解: <span id="realtime-correct" class="font-bold">0</span></span>
+                    <span>誤答: <span id="realtime-wrong" class="font-bold">0</span></span>
+                </div>
+            </div>
+
+            <div class="mb-10 text-lg leading-relaxed min-h-[80px]">
+                <p id="question-text" class="font-bold">問題文がここに入ります。</p>
+            </div>
+
+            <div id="input-area" class="mb-8">
+                <form id="answer-form" onsubmit="submitAnswer(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="w-full">
+                        <label for="answer-input" class="block text-xs font-bold mb-1 text-gray-500">解答：</label>
+                        <input type="text" id="answer-input" class="input-line" autocomplete="off" placeholder="...">
+                    </div>
+                    <button type="submit" id="submit-btn" class="btn-simple px-6 py-2 font-bold whitespace-nowrap mt-4 md:mt-0">
+                        判定
+                    </button>
+                </form>
+            </div>
+
+            <div id="feedback-area" class="hidden text-center bg-gray-50 border border-gray-200 p-6">
+                <h3 id="feedback-title" class="text-xl font-bold mb-2">判定</h3>
+                <p class="mb-6 text-gray-700">正解：<span id="feedback-answers" class="font-bold text-black border-b border-gray-400 pb-1"></span></p>
+                
+                <button onclick="nextQuestion()" class="btn-simple px-8 py-2 font-bold text-sm">
+                    次へ &gt;
+                </button>
+            </div>
+        </div>
+      
+        <div id="screen-result" class="screen">
+            <h2 class="text-2xl font-bold mb-8 text-center">結果</h2>
+            
+            <div class="text-center mb-10 flex justify-center gap-8">
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">正解</p>
+                    <p class="text-4xl font-bold" id="result-score">0</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">問題数</p>
+                    <p class="text-4xl font-bold text-gray-400" id="result-total">0</p>
+                </div>
+            </div>
+
+            <div id="mistakes-area" class="mb-10 hidden">
+                <h3 class="font-bold text-sm mb-4 border-b border-gray-200 pb-2">間違えた問題</h3>
+                <ul id="mistakes-list" class="space-y-4 text-sm">
+                </ul>
+            </div>
+
+            <div class="text-center space-y-4 flex flex-col items-center border-t border-gray-200 pt-8">
+                <button onclick="retryCurrent()" class="btn-simple px-8 py-3 font-bold w-full max-w-xs">
+                    もう一度挑戦する
+                </button>
+                <button onclick="navigate('subject')" class="text-sm text-gray-500 hover:text-black mt-2">
+                    単元選択へ戻る
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const appState = {
+            subjects: [],
+            currentSubject: null,
+            currentChapter: null,
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            wrongScore: 0,
+            mistakes: [],
+            isAnswered: false 
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.quizSubjects && window.quizSubjects.length > 0) {
+                
+                const grouped = {};
+                window.quizSubjects.forEach(subject => {
+                    const name = subject.subjectName;
+                    if (!grouped[name]) {
+                        grouped[name] = {
+                            subjectName: name,
+                            chapters: [],
+                            questions: []
+                        };
+                    }
+                    
+                    subject.chapters.forEach(ch => {
+                        if (!grouped[name].chapters.some(existing => existing.id === ch.id)) {
+                            grouped[name].chapters.push(ch);
+                        }
+                    });
+                    
+                    grouped[name].questions.push(...subject.questions);
+                });
+
+                appState.subjects = Object.values(grouped);
+                renderHome();
+
+            } else {
+                document.getElementById('no-data-msg').classList.remove('hidden');
+            }
+        });
+
+        function navigate(targetScreen) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(`screen-${targetScreen}`).classList.add('active');
+
+            if (targetScreen === 'home') renderHome();
+            if (targetScreen === 'subject') renderSubject();
+        }
+      
+        function renderHome() {
+            const listEl = document.getElementById('subject-list');
+            listEl.innerHTML = '';
+            
+            appState.subjects.forEach(subject => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left border border-gray-300 p-5 hover:bg-gray-50 transition-colors flex justify-between items-center';
+                btn.onclick = () => {
+                    appState.currentSubject = subject;
+                    navigate('subject');
+                };
+                
+                btn.innerHTML = `
+                    <div>
+                        <span class="text-xl font-bold block">${subject.subjectName}</span>
+                        <span class="text-xs text-gray-500 mt-1 block">全 ${subject.questions.length} 問</span>
+                    </div>
+                    <span class="text-gray-400">&gt;</span>
+                `;
+                listEl.appendChild(btn);
+            });
+        }
+
+        function renderSubject() {
+            const subject = appState.currentSubject;
+            document.getElementById('subject-title').innerText = subject.subjectName;
+            
+            const listEl = document.getElementById('chapter-list');
+            listEl.innerHTML = '';
+
+            const sortedChapters = [...subject.chapters].sort((a, b) => a.id - b.id);
+
+            sortedChapters.forEach(chapter => {
+                const qCount = subject.questions.filter(q => q.ch === chapter.id).length;
+
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left border border-gray-300 p-4 hover:border-black transition-colors flex justify-between items-center';
+                btn.onclick = () => startChapter(chapter);
+                btn.innerHTML = `
+                    <span class="font-bold text-sm md:text-base">${chapter.name}</span>
+                    <span class="text-xs text-gray-500">${qCount}問</span>
+                `;
+                listEl.appendChild(btn);
+            });
+        }
+
+        function startChapter(chapter) {
+            appState.currentChapter = chapter;
+            const qs = appState.currentSubject.questions.filter(q => q.ch === chapter.id);
+            if (qs.length === 0) {
+                alert('この単元には問題がありません。');
+                return;
+            }
+            appState.questions = shuffleArray([...qs]);
+            startQuizProcess();
+        }
+
+        function startRemix() {
+            appState.currentChapter = null;
+            const qs = appState.currentSubject.questions;
+            if (qs.length === 0) return;
+            appState.questions = shuffleArray([...qs]);
+            startQuizProcess();
+        }
+
+        function startQuizProcess() {
+            appState.currentIndex = 0;
+            appState.score = 0;
+            appState.wrongScore = 0;
+            appState.mistakes = [];
+            
+            const chapterName = appState.currentChapter ? appState.currentChapter.name : '全問ランダム';
+            document.getElementById('quiz-chapter-name').innerText = chapterName;
+            document.getElementById('q-total').innerText = appState.questions.length;
+            
+            updateScoreDisplay();
+            
+            navigate('quiz');
+            renderQuestion();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('realtime-correct').innerText = appState.score;
+            document.getElementById('realtime-wrong').innerText = appState.wrongScore;
+        }
+
+        function renderQuestion() {
+            appState.isAnswered = false;
+            const q = appState.questions[appState.currentIndex];
+            
+            document.getElementById('q-current').innerText = appState.currentIndex + 1;
+            document.getElementById('question-text').innerText = q.q;
+            
+            const inputEl = document.getElementById('answer-input');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            inputEl.value = '';
+            inputEl.disabled = false;
+            submitBtn.disabled = false;
+            
+            document.getElementById('input-area').classList.remove('hidden');
+            document.getElementById('feedback-area').classList.add('hidden');
+            
+            setTimeout(() => inputEl.focus(), 50);
+        }
+
+        function submitAnswer(e) {
+            e.preventDefault();
+            if (appState.isAnswered) return; 
+            
+            const inputEl = document.getElementById('answer-input');
+            const userInput = inputEl.value.trim();
+            
+            if (userInput === '') return;
+
+            appState.isAnswered = true;
+            inputEl.disabled = true;
+            document.getElementById('submit-btn').disabled = true;
+            
+            document.getElementById('input-area').classList.add('hidden');
+            
+            const currentQ = appState.questions[appState.currentIndex];
+            const isCorrect = checkCorrectness(userInput, currentQ.a);
+
+            showFeedback(isCorrect, currentQ);
+        }
+
+        function checkCorrectness(input, answers) {
+            const normalize = (str) => {
+                return str.toLowerCase()
+                          .replace(/[\s　]/g, '')
+                          .replace(/[\u30a1-\u30f6]/g, match => String.fromCharCode(match.charCodeAt(0) - 0x60));
+            };
+            const normalizedInput = normalize(input);
+            return answers.some(ans => normalize(ans) === normalizedInput);
+        }
+
+        function showFeedback(isCorrect, questionData) {
+            const area = document.getElementById('feedback-area');
+            const title = document.getElementById('feedback-title');
+            const ansDisplay = document.getElementById('feedback-answers');
+            
+            area.classList.remove('hidden');
+            ansDisplay.innerText = questionData.a.join(' / ');
+
+            if (isCorrect) {
+                appState.score++;
+                title.innerText = '◯ 正解';
+                title.className = 'text-xl font-bold mb-2 text-black';
+            } else {
+                appState.wrongScore++;
+                appState.mistakes.push(questionData);
+                title.innerText = '× 不正解';
+                title.className = 'text-xl font-bold mb-2 text-gray-500';
+            }
+            
+            updateScoreDisplay();
+        }
+
+        function nextQuestion() {
+            appState.currentIndex++;
+            if (appState.currentIndex < appState.questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            navigate('result');
+            document.getElementById('result-score').innerText = appState.score;
+            document.getElementById('result-total').innerText = appState.questions.length;
+
+            const mistakesArea = document.getElementById('mistakes-area');
+            const list = document.getElementById('mistakes-list');
+            list.innerHTML = '';
+
+            if (appState.mistakes.length > 0) {
+                mistakesArea.classList.remove('hidden');
+                appState.mistakes.forEach(q => {
+                    const li = document.createElement('li');
+                    li.className = 'border-l-2 border-gray-300 pl-3 py-1';
+                    li.innerHTML = `
+                        <p class="text-gray-600 mb-1">${q.q}</p>
+                        <p class="font-bold">正解：${q.a[0]}</p>
+                    `;
+                    list.appendChild(li);
+                });
+            } else {
+                mistakesArea.classList.add('hidden');
+            }
+        }
+
+        function retryCurrent() {
+            appState.questions = shuffleArray([...appState.questions]);
+            startQuizProcess();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
