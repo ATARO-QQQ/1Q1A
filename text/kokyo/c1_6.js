@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject6 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject6;
 
 window.quizConfig.chapters.push({ id: 6, name: "経済的な主体となる私たち" });
 
@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 6, q: "2012年以降に実施された、大胆な金融緩和などを柱とする経済政策の通称は何ですか。", a: ["アベノミクス", "あべのみくす"]}
 );
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject6);
