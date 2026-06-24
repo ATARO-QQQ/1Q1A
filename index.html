@@ -14,6 +14,7 @@
             min-height: 100vh;
         }
 
+        /* 画面切り替え用 */
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
 
@@ -22,6 +23,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* シンプルな入力欄 */
         .input-line {
             background: transparent;
             border: none;
@@ -37,6 +39,7 @@
             border-bottom-width: 2px;
         }
 
+        /* シンプルなボタン */
         .btn-simple {
             border: 1px solid #000;
             background-color: #fff;
@@ -54,13 +57,13 @@
         }
     </style>
 
+    <!-- ※ここで各教科のデータ（JSファイル）を読み込みます -->
     <script src="https://ataro-qqq.github.io/1Q1A/text/chiri_tanq/c1_1.js"></script>
 </head>
 <body class="p-4 md:p-8 flex justify-center items-start">
 
     <div class="w-full max-w-2xl mt-4 bg-white border border-gray-300 p-8 md:p-12 shadow-sm">
         
-        <!-- ヘッダー -->
         <div class="border-b border-black mb-8 pb-4 flex justify-between items-end">
             <h1 class="text-2xl font-bold tracking-widest">一問一答</h1>
         </div>
@@ -94,7 +97,9 @@
                 </button>
             </div>
         </div>
+
         <div id="screen-quiz" class="screen">
+            
             <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 pb-2 border-b border-gray-200 text-sm">
                 <div class="font-bold mb-2 md:mb-0" id="quiz-chapter-name">単元名</div>
                 <div class="flex gap-4">
@@ -129,7 +134,7 @@
                 </button>
             </div>
         </div>
-      
+
         <div id="screen-result" class="screen">
             <h2 class="text-2xl font-bold mb-8 text-center">結果</h2>
             
@@ -213,7 +218,7 @@
             if (targetScreen === 'home') renderHome();
             if (targetScreen === 'subject') renderSubject();
         }
-      
+
         function renderHome() {
             const listEl = document.getElementById('subject-list');
             listEl.innerHTML = '';
@@ -247,7 +252,7 @@
             const sortedChapters = [...subject.chapters].sort((a, b) => a.id - b.id);
 
             sortedChapters.forEach(chapter => {
-                const qCount = subject.questions.filter(q => q.ch === chapter.id).length;
+                const qCount = subject.questions.filter(q => String(q.ch) === String(chapter.id)).length;
 
                 const btn = document.createElement('button');
                 btn.className = 'w-full text-left border border-gray-300 p-4 hover:border-black transition-colors flex justify-between items-center';
@@ -262,7 +267,7 @@
 
         function startChapter(chapter) {
             appState.currentChapter = chapter;
-            const qs = appState.currentSubject.questions.filter(q => q.ch === chapter.id);
+            const qs = appState.currentSubject.questions.filter(q => String(q.ch) === String(chapter.id));
             if (qs.length === 0) {
                 alert('この単元には問題がありません。');
                 return;
@@ -322,7 +327,7 @@
 
         function submitAnswer(e) {
             e.preventDefault();
-            if (appState.isAnswered) return; 
+            if (appState.isAnswered) return;
             
             const inputEl = document.getElementById('answer-input');
             const userInput = inputEl.value.trim();
