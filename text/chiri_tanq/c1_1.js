@@ -2,7 +2,7 @@
 window.quizSubjects = window.quizSubjects || [];
 
 const currentSubject = {
-    subjectName: "地理",
+    subjectName: "地理探究",
     chapters: [],
     questions: []
 };
