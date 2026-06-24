@@ -1,7 +1,7 @@
 window.quizSubjects = window.quizSubjects || [];
 
 const publicSubject = {
-    subjectName: "公共（政治的な主体となる私たち）",
+    subjectName: "公共",
     chapters: [],
     questions: []
 };
