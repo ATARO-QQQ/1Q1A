@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 5, q: "地域の特定の課題（米軍基地問題や原発建設など）について、住民の賛否を直接問うために行われる投票を何と言いますか。", a: ["住民投票", "じゅうみんとうひょう"]}
 );
 
-window.quizSubjects.push(publicSubject5);
+window.quizSubjects.push(publicSubject);
