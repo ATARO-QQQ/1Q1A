@@ -55,4 +55,4 @@ window.quizConfig.questions.push(
 
 
 
-window.quizSubjects.push(publicSubject4);
+window.quizSubjects.push(publicSubject);
