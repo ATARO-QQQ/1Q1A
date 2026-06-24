@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 6, q: "2012年以降に実施された、大胆な金融緩和などを柱とする経済政策の通称は何ですか。", a: ["アベノミクス", "あべのみくす"]}
 );
 
-window.quizSubjects.push(publicSubject6);
+window.quizSubjects.push(publicSubject);
