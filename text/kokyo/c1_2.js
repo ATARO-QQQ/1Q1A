@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject2 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject2;
 
 window.quizConfig.chapters.push({ id: 2, name: "人間としての在り方生き方" });
 
@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 2, q: "生命倫理において重視される、「生命の質」または「生活の質」を意味する言葉をアルファベット3文字で何と言いますか。", a: ["QOL", "qol"]}
 );
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject2);
