@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 2, q: "生命倫理において重視される、「生命の質」または「生活の質」を意味する言葉をアルファベット3文字で何と言いますか。", a: ["QOL", "qol"]}
 );
 
-window.quizSubjects.push(publicSubject2);
+window.quizSubjects.push(publicSubject);
