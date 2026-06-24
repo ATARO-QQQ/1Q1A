@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject3 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject3;
 
 window.quizConfig.chapters.push({ id: 3, name: "公共的な空間における基本原理" });
 
@@ -58,4 +58,4 @@ window.quizConfig.questions.push(
     {ch: 3, q: "日本国憲法の前文で保障されている、全世界の国民が恐怖と欠乏から免かれ、平和のうちに生存する権利を何と言いますか。", a: ["平和的生存権", "へいわてきせいぞんけん"]}
 );
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject3);
