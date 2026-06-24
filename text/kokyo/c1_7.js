@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject7 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject7;
 
 window.quizConfig.chapters.push({ id: 7, name: "国際社会の中で生きる私たち" });
 
@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 7, q: "平和を維持・創造するために、軍事力によらない紛争予防や平和構築（復興支援など）の取り組みが重要視されています。これを「〇〇〇の構築」と言いますか。", a: ["平和", "へいわ"]}
 );
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject7);
