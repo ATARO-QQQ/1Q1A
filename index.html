@@ -123,6 +123,16 @@
                         判定
                     </button>
                 </form>
+                
+                <!-- スキップ・ギブアップボタンを追加 -->
+                <div class="mt-4 flex justify-end gap-6">
+                    <button type="button" onclick="skipQuestion()" class="text-sm text-gray-400 hover:text-black transition-colors">
+                        スキップ
+                    </button>
+                    <button type="button" onclick="giveUpQuestion()" class="text-sm text-gray-400 hover:text-black transition-colors">
+                        ギブアップ
+                    </button>
+                </div>
             </div>
 
             <div id="feedback-area" class="hidden text-center bg-gray-50 border border-gray-200 p-6">
@@ -346,17 +356,41 @@
             showFeedback(isCorrect, currentQ);
         }
 
+        // ギブアップ処理を追加
+        function giveUpQuestion() {
+            if (appState.isAnswered) return;
+            appState.isAnswered = true;
+            
+            document.getElementById('answer-input').disabled = true;
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('input-area').classList.add('hidden');
+            
+            const currentQ = appState.questions[appState.currentIndex];
+            
+            // フィードバック画面で「ギブアップ」として不正解扱いにする
+            showFeedback('giveup', currentQ);
+        }
+
+        // スキップ処理を追加
+        function skipQuestion() {
+            if (appState.isAnswered) return;
+            appState.isAnswered = true;
+            
+            // スコアにはカウントせず、すぐ次の問題へ
+            nextQuestion();
+        }
+
         function checkCorrectness(input, answers) {
             const normalize = (str) => {
                 return str.toLowerCase()
-                          .replace(/[\s　]/g, '')
-                          .replace(/[\u30a1-\u30f6]/g, match => String.fromCharCode(match.charCodeAt(0) - 0x60));
+                    .replace(/[\s　]/g, '')
+                    .replace(/[\u30a1-\u30f6]/g, match => String.fromCharCode(match.charCodeAt(0) - 0x60));
             };
             const normalizedInput = normalize(input);
             return answers.some(ans => normalize(ans) === normalizedInput);
         }
 
-        function showFeedback(isCorrect, questionData) {
+        function showFeedback(status, questionData) {
             const area = document.getElementById('feedback-area');
             const title = document.getElementById('feedback-title');
             const ansDisplay = document.getElementById('feedback-answers');
@@ -364,14 +398,20 @@
             area.classList.remove('hidden');
             ansDisplay.innerText = questionData.a.join(' / ');
 
-            if (isCorrect) {
+            if (status === true) {
                 appState.score++;
                 title.innerText = '◯ 正解';
                 title.className = 'text-xl font-bold mb-2 text-black';
-            } else {
+            } else if (status === false) {
                 appState.wrongScore++;
                 appState.mistakes.push(questionData);
                 title.innerText = '× 不正解';
+                title.className = 'text-xl font-bold mb-2 text-gray-500';
+            } else if (status === 'giveup') {
+                // ギブアップの場合は専用の表示にしつつ、内部データは不正解として扱う
+                appState.wrongScore++;
+                appState.mistakes.push(questionData);
+                title.innerText = '🏳 ギブアップ';
                 title.className = 'text-xl font-bold mb-2 text-gray-500';
             }
             
