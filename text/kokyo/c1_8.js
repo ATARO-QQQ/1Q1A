@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject8 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject8;
 
 window.quizConfig.chapters.push({ id: 8, name: "持続可能な社会づくりの主体となる私たち" });
 
@@ -63,4 +63,4 @@ window.quizConfig.questions.push(
     {ch: 8, q: "未来の社会をつくるのは、他でもない「〇〇〇〇」です。この言葉に入るのは何ですか。", a: ["私たち", "自分たち", "わたし", "わたしたち"]}
 );
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject8);
