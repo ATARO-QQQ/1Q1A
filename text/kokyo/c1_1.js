@@ -6,7 +6,7 @@ const publicSubject = {
     questions: []
 };
 
-window.quizConfig = publicSubject1;
+window.quizConfig = publicSubject;
 
 window.quizConfig.chapters.push({ id: 1, name: "公共的な空間をつくる私たち" });
 
