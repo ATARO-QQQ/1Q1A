@@ -1,12 +1,12 @@
 window.quizSubjects = window.quizSubjects || [];
 
-const publicSubject = {
+const publicSubject4 = {
     subjectName: "公共",
     chapters: [],
     questions: []
 };
 
-window.quizConfig = publicSubject;
+window.quizConfig = publicSubject4;
 
 window.quizConfig.chapters.push({ id: 4, name: "法的な主体となる私たち" });
 
@@ -55,4 +55,4 @@ window.quizConfig.questions.push(
 
 
 
-window.quizSubjects.push(publicSubject);
+window.quizSubjects.push(publicSubject4);
