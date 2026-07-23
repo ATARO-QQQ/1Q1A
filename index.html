@@ -4,7 +4,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="https://ataro-qqq.github.io/1Q1A/1Q1A-rogo.ico"/>
         <title>一問一答 - 1Q1A</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://ataro-qqq.github.io/1Q1A/users/style.css">
@@ -12,10 +11,12 @@
 
     <body class="flex flex-col items-center">
 
+
         <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-lg tracking-widest flex-col gap-3">
             <div class="animate-spin h-8 w-8 border-4 border-black border-t-transparent"></div>
             <p class="uppercase font-black tracking-[0.2em]">Loading</p>
         </div>
+
 
         <header id="header" class="hidden w-full max-w-4xl px-4 md:px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3 border-b-2 border-black bg-white sticky top-0 z-40 shadow-[0_4px_0_0_#f8fafc]">
             <h1 class="text-2xl md:text-3xl font-black tracking-tight uppercase">1Q1A.</h1>
@@ -26,6 +27,7 @@
         </header>
 
         <main class="w-full max-w-4xl p-4 md:p-6 flex-grow flex flex-col items-center">
+
 
             <div id="screen-auth" class="screen w-full max-w-sm mt-6 md:mt-10">
                 <div class="brutal-box p-6 md:p-8">
@@ -55,10 +57,12 @@
                 </div>
             </div>
 
+
             <div id="screen-home" class="screen w-full">
                 <h2 class="text-xl md:text-2xl font-black mb-5 md:mb-6 border-l-4 border-black pl-3 uppercase tracking-widest">Select Subject</h2>
 
                 <div id="subject-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
                 </div>
 
                 <div id="no-data-msg" class="hidden brutal-box p-5 text-center font-bold mt-6">
@@ -66,6 +70,7 @@
                     <p class="text-[10px] md:text-xs text-gray-500 font-bold tracking-wide">作問ページからデータを追加してください。</p>
                 </div>
             </div>
+
 
             <div id="screen-subject" class="screen w-full">
                 <button onclick="nav.go('home')" class="font-black mb-4 hover:bg-black hover:text-white px-2 py-1 transition-colors text-[10px] md:text-xs uppercase tracking-widest border-2 border-transparent hover:border-black">
@@ -77,6 +82,7 @@
                 <div class="mb-8">
                     <h3 class="text-base md:text-lg font-black mb-4 uppercase tracking-[0.1em] text-gray-400">Chapters</h3>
                     <div id="chapter-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+
                     </div>
                 </div>
 
@@ -87,8 +93,10 @@
                 </div>
             </div>
 
+
             <div id="screen-quiz" class="screen w-full">
                 <div class="brutal-box p-4 md:p-6 flex flex-col min-h-[300px] md:min-h-[350px]">
+
 
                     <div class="flex flex-wrap justify-between items-center border-b-2 border-black pb-3 mb-5 gap-2">
                         <div class="font-bold text-xs md:text-sm tracking-wider text-gray-700 flex flex-wrap items-center gap-1.5">
@@ -103,24 +111,34 @@
                         </div>
                     </div>
 
+
                     <div id="quiz-question-text" class="text-lg md:text-xl font-black leading-relaxed mb-6 flex-grow tracking-wide break-words">
                         問題文
                     </div>
 
+
                     <div class="mt-auto">
+
 
                         <div id="quiz-input-area">
                             <form onsubmit="quizApp.submitAnswer(event)" class="flex flex-col sm:flex-row gap-2 md:gap-3 items-stretch sm:items-end">
-                                <div class="flex-1">
+                                <div class="flex-1 relative">
                                     <label class="block font-black uppercase text-[10px] md:text-xs mb-1 tracking-widest text-gray-500">Answer</label>
-                                    <input type="text" id="quiz-answer-input" class="brutal-input h-10 md:h-11" autocomplete="off" placeholder="解答を入力...">
+
+
+                                    <div id="quiz-math-preview" class="hidden w-full min-h-[44px] bg-blue-50 border-2 border-black border-b-0 px-3 py-2 text-lg md:text-xl font-bold flex items-center overflow-x-auto text-blue-800">
+                                    </div>
+
+                                    <input type="text" id="quiz-answer-input" class="brutal-input h-10 md:h-11" autocomplete="off" placeholder="解答を入力..." oninput="quizApp.updatePreview()">
                                 </div>
                                 <button type="submit" id="quiz-submit-btn" class="brutal-btn black h-10 md:h-11 px-6 text-sm font-black whitespace-nowrap mt-2 sm:mt-0">
                                     判定
                                 </button>
                             </form>
 
+
                             <div id="math-keyboard" class="hidden grid-cols-6 gap-1 md:gap-2 mt-4">
+
                             </div>
 
                             <div class="mt-4 md:mt-5 flex justify-end gap-4 md:gap-5 pt-3 border-t-2 border-dashed border-gray-300">
@@ -133,8 +151,10 @@
                             </div>
                         </div>
 
+
                         <div id="quiz-feedback-area" class="hidden bg-black text-white border-2 border-black p-5 md:p-6">
                             <div class="flex items-center gap-3 mb-3" id="quiz-feedback-header">
+
                             </div>
                             <div class="mb-5">
                                 <p class="font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-400 mb-1">Correct Answer</p>
@@ -148,6 +168,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div id="screen-result" class="screen w-full">
                 <div class="brutal-box p-6 md:p-8 text-center max-w-2xl mx-auto">
@@ -168,6 +189,7 @@
                     <div id="result-mistakes-area" class="mb-10 text-left hidden">
                         <h3 class="font-black text-lg mb-4 uppercase tracking-[0.1em] border-l-4 border-black pl-2">Review</h3>
                         <ul id="result-mistakes-list" class="space-y-3">
+
                         </ul>
                     </div>
 
@@ -182,8 +204,10 @@
                 </div>
             </div>
 
+
             <div id="screen-mypage" class="screen w-full">
                 <h2 class="text-2xl font-black mb-6 border-l-4 border-black pl-3 uppercase tracking-[0.1em]">My Page</h2>
+
 
                 <div class="brutal-box p-4 md:p-5 mb-8 bg-black text-white">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-5 mb-4">
@@ -196,6 +220,7 @@
                         </div>
                     </div>
 
+
                     <form onsubmit="dataApp.saveName(event)" class="border-t border-gray-800 pt-4 mt-2 flex flex-col sm:flex-row gap-2 items-stretch sm:items-end">
                         <div class="flex-1">
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Display Name (表示名)</label>
@@ -206,6 +231,7 @@
                         </button>
                     </form>
                 </div>
+
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6">
                     <div class="brutal-box p-5 md:p-6 text-center flex flex-col justify-center bg-gray-50">
@@ -224,6 +250,7 @@
                     </div>
                 </div>
 
+
                 <div class="brutal-box p-5 md:p-6 bg-white mb-6">
                     <h3 class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-4 border-b-2 border-black pb-2">Per Question Speed</h3>
                     <div class="grid grid-cols-3 gap-2 md:gap-4 text-center">
@@ -241,6 +268,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <div class="brutal-box p-5 md:p-6 bg-white mb-8">
                     <h3 class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-4 border-b-2 border-black pb-2">Personal Records</h3>
