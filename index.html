@@ -475,52 +475,36 @@
             
             
             const utils = {
-                formatMath: (text, isMath) => {
-                    if (text === undefined || text === null) return "";
-                    let str = String(text);
-                    
-                    if (!isMath) {
-                        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    }
-            
-                    str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            
-                    
-                    str = str.replace(/\*/g, '×').replace(/\
-            
-                    
-                    str = str.replace(/'/g, '<span class="math-sup">′</span>');
-            
-                    
-                    str = str.replace(/∫\[(.*?) to (.*?)\]/g, '<span class="math-integral">∫</span><sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
-                    str = str.replace(/∑\[(.*?) to (.*?)\]/g, '<span class="math-integral">∑</span><sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
-                    
-                    
-                    str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
-                    str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
-                    
-                    
-                    str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
-                    str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
-            
-                    
-                    const tags = [];
-                    str = str.replace(/<[^>]+>/g, match => {
-                        tags.push(match);
-                        return `___TAG${tags.length - 1}___`;
-                    });
-            
-                    
-                    str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|c|f|g|r|e|t|u|C|A|B)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
-            
-                    
-                    tags.forEach((tag, i) => {
-                        str = str.replace(`___TAG${i}___`, tag);
-                    });
-            
-                    return `<span class="math-content">${str}</span>`;
-                }
-            };
+            formatMath: (text, isMath) => {
+                if (text === undefined || text === null) return "";
+                let str = String(text);
+                
+                str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                if (!isMath) return str;
+
+                
+                str = str.replace(/-&gt;/g, '→').replace(/\*/g, '×');
+
+                
+                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                
+                
+                str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
+                str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
+                
+                
+                str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
+                str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
+
+                
+                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+
+                
+                return `<span class="math-content">${str}</span>`;
+            }
+        };
             
             const nav = {
                 screens: ['auth', 'home', 'subject', 'quiz', 'result', 'mypage'],
