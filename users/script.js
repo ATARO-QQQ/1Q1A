@@ -27,6 +27,39 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         const $ = (id) => document.getElementById(id);
 
+        
+        const utils = {
+            formatMath: (text, isMath) => {
+                if (text === undefined || text === null) return "";
+                let str = String(text);
+                
+                str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                if (!isMath) return str;
+
+                
+                str = str.replace(/-&gt;/g, '→').replace(/\*/g, '×');
+
+                
+                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                
+                
+                str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
+                str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
+                
+                
+                str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
+                str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
+
+                
+                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+
+                
+                return `<span class="math-content">${str}</span>`;
+            }
+        };
+
         const nav = {
             screens: ['auth', 'home', 'subject', 'quiz', 'result', 'mypage'],
             go: (targetScreen) => {
@@ -47,10 +80,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         
         const mathApp = {
             keys: [
-                '7', '8', '9', '/', '(', ')',
-                '4', '5', '6', '*', '√', '^',
-                '1', '2', '3', '-', '∫', "'",
-                '0', '.', '=', '+', 'x', 'BS'
+                { d: '7', i: '7' }, { d: '8', i: '8' }, { d: '9', i: '9' }, { d: '÷', i: '÷' }, { d: '(', i: '(' }, { d: ')', i: ')' },
+                { d: '4', i: '4' }, { d: '5', i: '5' }, { d: '6', i: '6' }, { d: '×', i: '×' }, { d: '√', i: '√(' }, { d: 'a^b', i: '^(' },
+                { d: '1', i: '1' }, { d: '2', i: '2' }, { d: '3', i: '3' }, { d: '-', i: '-' }, { d: '∫', i: '∫' }, { d: '∫[a~b]', i: '∫[ to ]' },
+                { d: '0', i: '0' }, { d: '.', i: '.' }, { d: '=', i: '=' }, { d: '+', i: '+' }, { d: '∑', i: '∑' }, { d: '∑[a~b]', i: '∑[ to ]' },
+                { d: '𝑥', i: 'x' }, { d: '𝑦', i: 'y' }, { d: 'n', i: 'n' }, { d: "'", i: "'" }, { d: 'a_b', i: '_(' }, { d: 'BS', i: 'BS' }
             ],
             render: () => {
                 const kb = $('math-keyboard');
@@ -58,21 +92,48 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 mathApp.keys.forEach(k => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'brutal-btn bg-gray-50 p-1 md:p-2 text-xs md:text-sm font-black w-full h-10';
-                    if (k === 'BS') {
+                    btn.className = 'brutal-btn bg-gray-50 p-1 md:p-2 text-xs md:text-sm font-black w-full h-10 md:h-11';
+                    if (k.d === 'BS') {
                         btn.classList.add('danger');
                     }
-                    btn.innerText = k;
-                    btn.onclick = () => mathApp.press(k);
+                    
+                    if (k.d === '𝑥' || k.d === '𝑦' || k.d === 'n') {
+                        btn.innerHTML = `<span class="math-italic font-serif">${k.i}</span>`;
+                    } else {
+                        btn.innerText = k.d;
+                    }
+
+                    btn.onclick = () => mathApp.press(k.i);
                     kb.appendChild(btn);
                 });
             },
-            press: (key) => {
+            press: (insertText) => {
                 const input = $('quiz-answer-input');
-                if (key === 'BS') {
-                    input.value = input.value.slice(0, -1);
+                if (insertText === 'BS') {
+                    const start = input.selectionStart;
+                    const end = input.selectionEnd;
+                    const text = input.value;
+                    if (start === end && start > 0) {
+                        input.value = text.slice(0, start - 1) + text.slice(end);
+                        input.setSelectionRange(start - 1, start - 1);
+                    } else if (start !== end) {
+                        input.value = text.slice(0, start) + text.slice(end);
+                        input.setSelectionRange(start, start);
+                    }
                 } else {
-                    input.value += key;
+                    const start = input.selectionStart;
+                    const end = input.selectionEnd;
+                    const text = input.value;
+                    input.value = text.slice(0, start) + insertText + text.slice(end);
+                    
+                    let newCursorPos = start + insertText.length;
+                    
+                    if (insertText === '∫[ to ]' || insertText === '∑[ to ]') {
+                        newCursorPos = start + 2; 
+                    } else if (insertText === '√(' || insertText === '^(' || insertText === '_(') {
+                        newCursorPos = start + 2;
+                    }
+                    input.setSelectionRange(newCursorPos, newCursorPos);
                 }
                 input.focus();
             }
@@ -401,7 +462,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 $('quiz-score').innerText = q.score;
                 $('quiz-mistakes').innerText = q.mistakes.length;
                 
-                $('quiz-question-text').innerText = currentQ.q;
+                
+                $('quiz-question-text').innerHTML = utils.formatMath(currentQ.q, currentQ.isMath);
                 
                 $('quiz-answer-input').value = '';
                 $('quiz-input-area').classList.remove('hidden');
@@ -420,7 +482,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             },
 
             checkStr: (input, answers) => {
-                const normalize = (str) => str.toLowerCase().replace(/[\s　]/g, '').replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+                const normalize = (str) => {
+                    let s = str.toLowerCase().replace(/[\s　]/g, '').replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+                    
+                    s = s.replace(/×/g, '*').replace(/÷/g, '/');
+                    return s;
+                };
                 const normIn = normalize(input);
                 return answers.some(a => normalize(a) === normIn);
             },
@@ -446,7 +513,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 
                 dataApp.recordQuestionLog(currentQ, isCorrect ? 'correct' : 'wrong', qTimeSec);
 
-                quizApp.showFeedback(isCorrect ? 'correct' : 'wrong', currentQ.a);
+                quizApp.showFeedback(isCorrect ? 'correct' : 'wrong', currentQ.a, currentQ.isMath);
             },
 
             skip: () => {
@@ -469,10 +536,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 
                 dataApp.recordQuestionLog(currentQ, 'giveup', qTimeSec);
 
-                quizApp.showFeedback('giveup', currentQ.a);
+                quizApp.showFeedback('giveup', currentQ.a, currentQ.isMath);
             },
 
-            showFeedback: (type, answers) => {
+            showFeedback: (type, answers, isMath) => {
                 $('quiz-input-area').classList.add('hidden');
                 
                 const header = $('quiz-feedback-header');
@@ -484,7 +551,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     header.innerHTML = `<span class="text-2xl md:text-3xl font-black text-gray-400">-</span><h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Give Up</h3>`;
                 }
 
-                $('quiz-feedback-answer').innerText = answers.join(' / ');
+                
+                $('quiz-feedback-answer').innerHTML = answers.map(ans => utils.formatMath(ans, isMath)).join(' / ');
                 $('quiz-feedback-area').classList.remove('hidden');
                 
                 setTimeout(() => $('quiz-next-btn').focus(), 50);
@@ -521,9 +589,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     q.mistakes.forEach(mis => {
                         const li = document.createElement('li');
                         li.className = 'border-2 border-black p-3 md:p-4 bg-gray-50';
+                        
                         li.innerHTML = `
-                            <p class="font-black text-sm md:text-base mb-2.5 break-words">${mis.q}</p>
-                            <p class="font-bold text-black text-xs md:text-sm bg-white border-2 border-black inline-block px-1.5 py-0.5"><span class="bg-black text-white px-1.5 py-0.5 mr-1.5 text-[10px] md:text-xs uppercase">Answer</span> ${mis.a[0]}</p>
+                            <p class="font-black text-sm md:text-base mb-2.5 break-words">${utils.formatMath(mis.q, mis.isMath)}</p>
+                            <p class="font-bold text-black text-xs md:text-sm bg-white border-2 border-black inline-block px-1.5 py-0.5"><span class="bg-black text-white px-1.5 py-0.5 mr-1.5 text-[10px] md:text-xs uppercase">Answer</span> ${utils.formatMath(mis.a[0], mis.isMath)}</p>
                         `;
                         misList.appendChild(li);
                     });
