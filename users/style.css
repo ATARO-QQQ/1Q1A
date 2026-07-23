@@ -1,12 +1,12 @@
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-    background-color: #fff;
-    color: #000;
+    background-color: #f8fafc;
+    color: #0f172a;
     min-height: 100vh;
     margin: 0;
     background-image:
-        linear-gradient(#f0f0f0 1px, transparent 1px),
-        linear-gradient(90deg, #f0f0f0 1px, transparent 1px);
+        linear-gradient(#e2e8f0 1.5px, transparent 1.5px),
+        linear-gradient(90deg, #e2e8f0 1.5px, transparent 1.5px);
     background-size: 32px 32px;
     background-position: center top;
 }
@@ -17,7 +17,7 @@ body {
 
 .screen.active {
     display: block;
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
@@ -34,26 +34,25 @@ body {
 
 .brutal-box {
     border: 3px solid #000;
-    box-shadow: 8px 8px 0px #000;
+    box-shadow: 6px 6px 0px #000;
     background-color: #fff;
     border-radius: 0;
 }
 
 .brutal-btn {
     border: 3px solid #000;
-    box-shadow: 6px 6px 0px #000;
+    box-shadow: 4px 4px 0px #000;
     background-color: #fff;
     color: #000;
-    font-weight: 800;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.15s ease-out;
+    transition: all 0.1s ease-out;
     border-radius: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
 }
 
 .brutal-btn:hover:not(:disabled) {
@@ -62,55 +61,59 @@ body {
 }
 
 .brutal-btn:active:not(:disabled) {
-    transform: translate(6px, 6px);
+    transform: translate(4px, 4px);
     box-shadow: 0px 0px 0px #000;
 }
 
 .brutal-btn.black {
     background-color: #000;
     color: #fff;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0px #64748b;
 }
 
 .brutal-btn.black:hover:not(:disabled) {
     background-color: #fff;
     color: #000;
+    box-shadow: 4px 4px 0px #000;
 }
 
-.brutal-btn:disabled {
-    border-color: #ccc;
-    box-shadow: 6px 6px 0px #ccc;
-    color: #999;
-    background-color: #f9f9f9;
-    cursor: not-allowed;
-    transform: none;
+.brutal-btn.danger {
+    background-color: #fff;
+    color: #dc2626;
+    border: 3px solid #dc2626;
+    box-shadow: 4px 4px 0px #dc2626;
+}
+
+.brutal-btn.danger:hover:not(:disabled) {
+    background-color: #dc2626;
+    color: #fff;
+    border-color: #000;
+    box-shadow: 4px 4px 0px #000;
 }
 
 .brutal-input {
     border: 3px solid #000;
     background-color: #fff;
-    padding: 12px 16px;
+    padding: 10px 14px;
     font-size: 1.125rem;
     width: 100%;
     outline: none;
     border-radius: 0;
-    transition: all 0.2s;
+    transition: all 0.15s;
     font-weight: 700;
-    box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.03);
 }
 
 .brutal-input:focus {
-    background-color: #fafafa;
-    box-shadow: inset 6px 6px 0px rgba(0, 0, 0, 0.08);
+    background-color: #fefce8;
+    border-color: #000;
 }
 
-.brutal-input:disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
-    border-color: #d1d5db;
-}
-
-.marker-line {
-    background: linear-gradient(transparent 60%, #000 60%);
+.chapter-badge {
+    background-color: #000;
+    color: #fff;
+    padding: 3px 8px;
+    font-weight: 800;
     display: inline-block;
-    color: #000;
+    letter-spacing: 0.05em;
 }
