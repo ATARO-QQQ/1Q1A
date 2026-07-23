@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>一問一答 - 作問・管理</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            body {
+                font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+                background-color: #fafafa;
+                color: #111;
+                min-height: 100vh;
+                margin: 0;
+                background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+                background-size: 20px 20px;
+            }
+
+            .screen {
+                display: none;
+            }
+
+            .screen.active {
+                display: block;
+                animation: slideUp 0.3s ease-out;
+            }
+
+            @keyframes slideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .brutal-box {
+                border: 2px solid #111;
+                box-shadow: 4px 4px 0px #111;
+                background-color: #fff;
+                border-radius: 0;
+            }
+
+            .brutal-btn {
+                border: 2px solid #111;
+                box-shadow: 3px 3px 0px #111;
+                background-color: #fff;
+                color: #111;
+                font-weight: 700;
+                cursor: pointer;
+                transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+                border-radius: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .brutal-btn:hover:not(:disabled) {
+                background-color: #f3f4f6;
+            }
+
+            .brutal-btn:active:not(:disabled) {
+                transform: translate(3px, 3px);
+                box-shadow: 0px 0px 0px #111;
+            }
+
+            .brutal-btn.black {
+                background-color: #111;
+                color: #fff;
+            }
+
+            .brutal-btn.black:hover:not(:disabled) {
+                background-color: #374151;
+            }
+
+            .brutal-btn.danger {
+                background-color: #000;
+                color: #fff;
+                border-color: #000;
+            }
+
+            .brutal-btn:disabled {
+                border-color: #d1d5db;
+                box-shadow: 3px 3px 0px #d1d5db;
+                color: #9ca3af;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .brutal-input,
+            .brutal-textarea,
+            .brutal-select {
+                border: 2px solid #111;
+                background-color: #fff;
+                padding: 10px 14px;
+                font-size: 1rem;
+                width: 100%;
+                outline: none;
+                border-radius: 0;
+                transition: background-color 0.2s, border-color 0.2s;
+                font-weight: 700;
+            }
+
+            .brutal-input:focus,
+            .brutal-textarea:focus,
+            .brutal-select:focus {
+                background-color: #fefce8;
+                border-color: #000;
+            }
+
+            .tab-btn {
+                border: 2px solid #111;
+                padding: 8px 16px;
+                font-weight: 700;
+                background-color: #e5e7eb;
+                cursor: pointer;
+                border-bottom: none;
+                margin-right: 4px;
+            }
+
+            .tab-btn.active {
+                background-color: #fff;
+                position: relative;
+                top: 2px;
+            }
+        </style>
+    </head>
+
+    <body class="flex flex-col items-center">
+
+
+        <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
+            <div class="animate-spin h-10 w-10 border-2 border-black border-t-transparent"></div>
+            <p>LOADING...</p>
+        </div>
+
+
+        <header id="header" class="hidden w-full max-w-5xl px-4 md:px-8 py-4 md:py-6 flex justify-between items-end border-b-2 border-black bg-white sticky top-0 z-40">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tighter">1Q1A ADMIN.</h1>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Question Authoring System</p>
+            </div>
+            <nav class="flex gap-4 md:gap-6 text-xs md:text-sm">
+                <button onclick="nav.go('questions')" class="font-bold hover:underline underline-offset-4 decoration-2 uppercase">Questions</button>
+                <button onclick="nav.go('users')" class="font-bold hover:underline underline-offset-4 decoration-2 uppercase">ID Manager</button>
+                <button onclick="authApp.logout()" class="font-bold text-gray-400 hover:text-black uppercase">Logout</button>
+            </nav>
+        </header>
+
+        <main class="w-full max-w-5xl p-4 md:p-8 flex-grow">
+
+
+            <div id="screen-auth" class="screen w-full max-w-md mx-auto mt-10 md:mt-20">
+                <div class="brutal-box p-6 md:p-10">
+                    <h2 class="text-2xl font-black mb-2 text-center uppercase tracking-widest">ADMIN LOGIN</h2>
+                    <p class="text-xs text-center text-gray-500 mb-8 font-bold">作問ユーザー専用ポータル</p>
+
+                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6"></div>
+
+                    <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-5">
+                        <div>
+                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Admin Email</label>
+                            <input type="email" id="auth-email" required class="brutal-input" placeholder="admin@example.com">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Password</label>
+                            <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="brutal-btn black w-full py-3 text-base tracking-widest mt-6">
+                            ログイン
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+
+            <div id="screen-questions" class="screen w-full">
+
+
+                <div class="mb-12">
+                    <div class="flex border-b-2 border-black">
+                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active uppercase text-xs md:text-sm">Excel / TSV 括一括入力</button>
+                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn uppercase text-xs md:text-sm">個別手入力</button>
+                    </div>
+
+
+                    <div id="tab-excel" class="brutal-box p-6 bg-white border-t-0">
+                        <h3 class="font-black text-lg mb-2 uppercase tracking-widest">Excel / スプレッドシートから貼り付け</h3>
+                        <p class="text-xs font-bold text-gray-500 mb-4">
+                            列順序: <span class="text-black bg-gray-200 px-1 py-0.5">教科</span> <span class="text-black bg-gray-200 px-1 py-0.5">単元</span> <span class="text-black bg-gray-200 px-1 py-0.5">問題文</span> <span class="text-black bg-gray-200 px-1 py-0.5">正解1</span> <span class="text-black bg-gray-200 px-1 py-0.5">正解2(任意)</span> ...（タブ区切り）
+                        </p>
+                        <textarea id="excel-input" class="brutal-textarea h-32 font-mono text-xs md:text-sm mb-4" placeholder="地理探求	1-1 世界の姿	地球の表面積における海の割合は約何％か。	70%	70	71%" oninput="adminApp.parseExcelInput()"></textarea>
+
+
+                        <div id="excel-preview-area" class="hidden mb-6">
+                            <h4 class="font-bold text-xs uppercase text-gray-500 mb-2">登録プレビュー (<span id="preview-count">0</span>件)</h4>
+                            <div class="max-h-48 overflow-y-auto border-2 border-black">
+                                <table class="w-full text-left text-xs font-bold">
+                                    <thead class="bg-black text-white sticky top-0">
+                                        <tr>
+                                            <th class="p-2 border-r border-gray-700">教科</th>
+                                            <th class="p-2 border-r border-gray-700">単元</th>
+                                            <th class="p-2 border-r border-gray-700">問題文</th>
+                                            <th class="p-2">正解キーワード</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="preview-tbody" class="divide-y divide-gray-300"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase">
+                            一括登録を実行する
+                        </button>
+                    </div>
+
+
+                    <div id="tab-single" class="brutal-box p-6 bg-white border-t-0 hidden">
+                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-bold text-xs uppercase mb-1 text-gray-500">教科名</label>
+                                    <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-xs uppercase mb-1 text-gray-500">単元名</label>
+                                    <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1 text-gray-500">問題文</label>
+                                <textarea id="single-q" required class="brutal-input h-20" placeholder="問題文を入力..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-xs uppercase mb-1 text-gray-500">正解キーワード (カンマ区切りで別解を追加)</label>
+                                <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
+                            </div>
+                            <button type="submit" class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase">
+                                問題を追加登録
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+                        <h3 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3">登録済み問題一覧 (<span id="total-q-count">0</span>)</h3>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-select text-xs py-2">
+                                <option value="">すべての教科</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" id="questions-list">
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div id="screen-users" class="screen w-full max-w-2xl mx-auto">
+                <h2 class="text-2xl font-black mb-2 uppercase tracking-widest border-l-4 border-black pl-3">ID Manager</h2>
+                <p class="text-xs font-bold text-gray-500 mb-8">新しい作問ユーザーの発行・管理を行います。</p>
+
+                <div class="brutal-box p-6 md:p-8 mb-10">
+                    <h3 class="font-black text-lg mb-6 uppercase border-b-2 border-black pb-2">新規作問ユーザーを発行</h3>
+                    <form onsubmit="adminApp.createUser(event)" class="space-y-4">
+                        <div>
+                            <label class="block font-bold text-xs uppercase text-gray-500 mb-1">新規登録用 Email</label>
+                            <input type="email" id="new-user-email" required class="brutal-input" placeholder="new_author@example.com">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-xs uppercase text-gray-500 mb-1">初期パスワード</label>
+                            <input type="password" id="new-user-password" required minlength="6" class="brutal-input" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase mt-4">
+                            作問ユーザーアカウントを作成
+                        </button>
+                    </form>
+                </div>
+
+                <div>
+                    <h3 class="font-black text-lg mb-4 uppercase text-gray-500">登録済み作問ユーザー</h3>
+                    <ul id="admin-users-list" class="space-y-2">
+
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+            import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
+                from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp } 
+                from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            
+            const firebaseConfig = {
+                apiKey: "AIzaSyAYatcV4UyTrn4_Wf2HVzdIwM97buXGxLA",
+                authDomain: "agenthtml-5f5fb.firebaseapp.com",
+                projectId: "agenthtml-5f5fb",
+                storageBucket: "agenthtml-5f5fb.firebasestorage.app",
+                messagingSenderId: "880525619742",
+                appId: "1:880525619742:web:fd6cb57926abb4f5ddb40f",
+                measurementId: "G-L8906M810M"
+            };
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            
+            const state = {
+                user: null,
+                questions: [],
+                adminUsers: [],
+                parsedBulkData: []
+            };
+            
+            const $ = (id) => document.getElementById(id);
+            
+            const nav = {
+                screens: ['auth', 'questions', 'users'],
+                go: (targetScreen) => {
+                    nav.screens.forEach(s => {
+                        const el = $(`screen-${s}`);
+                        if (el) el.classList.toggle('active', s === targetScreen);
+                    });
+                    $('header').classList.toggle('hidden', targetScreen === 'auth');
+                    if (targetScreen === 'questions') adminApp.loadQuestions();
+                    if (targetScreen === 'users') adminApp.loadAdminUsers();
+                },
+                setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
+            };
+            
+            const authApp = {
+                init: () => {
+                    onAuthStateChanged(auth, async (user) => {
+                        nav.setLoading(true);
+                        if (user) {
+                            
+                            const isAdmin = await authApp.checkAdminRole(user.uid);
+                            if (isAdmin) {
+                                state.user = user;
+                                nav.go('questions');
+                            } else {
+                                alert("作問権限がありません。作問ユーザーアカウントでログインしてください。");
+                                await signOut(auth);
+                                nav.go('auth');
+                            }
+                        } else {
+                            state.user = null;
+                            nav.go('auth');
+                        }
+                        nav.setLoading(false);
+                    });
+                },
+                checkAdminRole: async (uid) => {
+                    try {
+                        const snap = await getDoc(doc(db, 'admin_users', uid));
+                        
+                        const allAdmins = await getDocs(collection(db, 'admin_users'));
+                        if (allAdmins.empty) {
+                            await setDoc(doc(db, 'admin_users', uid), { email: auth.currentUser.email, createdAt: serverTimestamp() });
+                            return true;
+                        }
+                        return snap.exists();
+                    } catch (e) {
+                        console.error(e);
+                        return false;
+                    }
+                },
+                handleLogin: async (e) => {
+                    e.preventDefault();
+                    const email = $('auth-email').value;
+                    const password = $('auth-password').value;
+                    try {
+                        $('auth-error').classList.add('hidden');
+                        nav.setLoading(true);
+                        await signInWithEmailAndPassword(auth, email, password);
+                    } catch (err) {
+                        nav.setLoading(false);
+                        $('auth-error').innerText = 'ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。';
+                        $('auth-error').classList.remove('hidden');
+                    }
+                },
+                logout: () => signOut(auth)
+            };
+            
+            const adminApp = {
+                switchTab: (tab) => {
+                    $('tab-excel').classList.toggle('hidden', tab !== 'excel');
+                    $('tab-single').classList.toggle('hidden', tab !== 'single');
+                    $('tab-excel-btn').classList.toggle('active', tab === 'excel');
+                    $('tab-single-btn').classList.toggle('active', tab === 'single');
+                },
+            
+                
+                parseExcelInput: () => {
+                    const text = $('excel-input').value.trim();
+                    if (!text) {
+                        $('excel-preview-area').classList.add('hidden');
+                        $('excel-submit-btn').disabled = true;
+                        state.parsedBulkData = [];
+                        return;
+                    }
+            
+                    const lines = text.split('\n');
+                    const parsed = [];
+            
+                    lines.forEach(line => {
+                        const row = line.split('\t').map(cell => cell.trim()).filter(c => c !== '');
+                        if (row.length >= 4) {
+                            const subject = row[0];
+                            const chapter = row[1];
+                            const q = row[2];
+                            const a = row.slice(3); 
+                            parsed.push({ subject, chapter, q, a });
+                        }
+                    });
+            
+                    state.parsedBulkData = parsed;
+                    $('preview-count').innerText = parsed.length;
+            
+                    const tbody = $('preview-tbody');
+                    tbody.innerHTML = '';
+                    parsed.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-gray-100';
+                        tr.innerHTML = `
+                            <td class="p-2 border-r border-gray-300">${item.subject}</td>
+                            <td class="p-2 border-r border-gray-300">${item.chapter}</td>
+                            <td class="p-2 border-r border-gray-300 truncate max-w-xs">${item.q}</td>
+                            <td class="p-2">${item.a.join(' / ')}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+            
+                    $('excel-preview-area').classList.remove('hidden');
+                    $('excel-submit-btn').disabled = parsed.length === 0;
+                },
+            
+                submitBulk: async () => {
+                    if (state.parsedBulkData.length === 0) return;
+                    nav.setLoading(true);
+                    try {
+                        const batch = writeBatch(db);
+                        state.parsedBulkData.forEach(data => {
+                            const newDocRef = doc(collection(db, 'questions'));
+                            batch.set(newDocRef, data);
+                        });
+                        await batch.commit();
+                        alert(`${state.parsedBulkData.length} 件の問題を一括登録しました。`);
+                        $('excel-input').value = '';
+                        adminApp.parseExcelInput();
+                        await adminApp.loadQuestions();
+                    } catch (e) {
+                        alert("一括登録に失敗しました。");
+                        console.error(e);
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                submitSingle: async (e) => {
+                    e.preventDefault();
+                    const subject = $('single-subject').value.trim();
+                    const chapter = $('single-chapter').value.trim();
+                    const q = $('single-q').value.trim();
+                    const aRaw = $('single-a').value.trim();
+                    const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+            
+                    nav.setLoading(true);
+                    try {
+                        await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a });
+                        alert("問題を追加しました。");
+                        $('single-q').value = '';
+                        $('single-a').value = '';
+                        await adminApp.loadQuestions();
+                    } catch (e) {
+                        alert("登録に失敗しました。");
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                loadQuestions: async () => {
+                    nav.setLoading(true);
+                    try {
+                        const snap = await getDocs(collection(db, 'questions'));
+                        state.questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        $('total-q-count').innerText = state.questions.length;
+            
+                        
+                        const subjects = Array.from(new Set(state.questions.map(q => q.subject))).sort();
+                        const filterSelect = $('filter-subject');
+                        const currentVal = filterSelect.value;
+                        filterSelect.innerHTML = '<option value="">すべての教科</option>';
+                        subjects.forEach(subj => {
+                            const opt = document.createElement('option');
+                            opt.value = subj;
+                            opt.innerText = subj;
+                            filterSelect.appendChild(opt);
+                        });
+                        filterSelect.value = currentVal;
+            
+                        adminApp.renderQuestionsList();
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                renderQuestionsList: () => {
+                    const list = $('questions-list');
+                    list.innerHTML = '';
+                    const filterSubj = $('filter-subject').value;
+            
+                    let targetQuestions = state.questions;
+                    if (filterSubj) {
+                        targetQuestions = targetQuestions.filter(q => q.subject === filterSubj);
+                    }
+            
+                    if (targetQuestions.length === 0) {
+                        list.innerHTML = `<div class="p-6 text-center text-gray-400 font-bold border-2 border-gray-200">問題データが存在しません。</div>`;
+                        return;
+                    }
+            
+                    targetQuestions.forEach(q => {
+                        const card = document.createElement('div');
+                        card.className = 'brutal-box p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+                        card.innerHTML = `
+                            <div class="flex-grow">
+                                <div class="flex gap-2 text-xs font-bold mb-1">
+                                    <span class="bg-black text-white px-2 py-0.5">${q.subject}</span>
+                                    <span class="bg-gray-200 text-black px-2 py-0.5">${q.chapter}</span>
+                                </div>
+                                <p class="font-bold text-base mb-1">${q.q}</p>
+                                <p class="text-xs font-bold text-gray-500">正解: ${q.a.join(' / ')}</p>
+                            </div>
+                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-xs px-3 py-1.5 whitespace-nowrap">
+                                削除
+                            </button>
+                        `;
+                        list.appendChild(card);
+                    });
+                },
+            
+                deleteQuestion: async (id) => {
+                    if (!confirm("この問題を削除してもよろしいですか？")) return;
+                    nav.setLoading(true);
+                    try {
+                        await deleteDoc(doc(db, 'questions', id));
+                        await adminApp.loadQuestions();
+                    } catch (e) {
+                        alert("削除に失敗しました。");
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                
+                createUser: async (e) => {
+                    e.preventDefault();
+                    const email = $('new-user-email').value.trim();
+                    const password = $('new-user-password').value.trim();
+            
+                    nav.setLoading(true);
+                    try {
+                        
+                        const res = await createUserWithEmailAndPassword(auth, email, password);
+                        
+                        await setDoc(doc(db, 'admin_users', res.user.uid), {
+                            email: email,
+                            createdAt: serverTimestamp()
+                        });
+            
+                        alert(`作問ユーザー (${email}) を正常に作成しました。`);
+                        $('new-user-email').value = '';
+                        $('new-user-password').value = '';
+                        await adminApp.loadAdminUsers();
+                    } catch (e) {
+                        alert(`ユーザー作成エラー: ${e.message}`);
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                loadAdminUsers: async () => {
+                    try {
+                        const snap = await getDocs(collection(db, 'admin_users'));
+                        const list = $('admin-users-list');
+                        list.innerHTML = '';
+                        snap.docs.forEach(d => {
+                            const data = d.data();
+                            const li = document.createElement('li');
+                            li.className = 'brutal-box p-3 bg-white flex justify-between items-center text-sm font-bold';
+                            li.innerHTML = `
+                                <span>${data.email}</span>
+                                <span class="text-xs text-gray-400">UID: ${d.id.substring(0, 8)}...</span>
+                            `;
+                            list.appendChild(li);
+                        });
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            };
+            
+            window.nav = nav;
+            window.authApp = authApp;
+            window.adminApp = adminApp;
+            
+            window.onload = () => authApp.init();
+            
+        </script>
+    </body>
+
+</html>
