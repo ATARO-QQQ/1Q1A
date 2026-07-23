@@ -4,8 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="https://ataro-qqq.github.io/1Q1A/1Q1A-rogo.ico"/>
-        <title>一問一答 - 1Q1A admin</title>
+        <title>一問一答 - 1Q1A ADMIN</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body {
@@ -279,6 +278,18 @@
                         </div>
 
 
+                        <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-100 border-2 border-black p-3">
+                            <div>
+                                <label class="block font-black text-[10px] uppercase text-gray-500 tracking-[0.1em] mb-1">Subject Order (教科の表示順)</label>
+                                <input type="number" id="excel-subject-order" class="brutal-input text-xs py-1.5" placeholder="例: 1 (任意)">
+                            </div>
+                            <div>
+                                <label class="block font-black text-[10px] uppercase text-gray-500 tracking-[0.1em] mb-1">Chapter Order (単元の表示順)</label>
+                                <input type="number" id="excel-chapter-order" class="brutal-input text-xs py-1.5" placeholder="例: 1 (任意)">
+                            </div>
+                        </div>
+
+
                         <div class="mb-5 flex items-center">
                             <label class="flex items-center gap-2 cursor-pointer group">
                                 <input type="checkbox" id="excel-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer" onchange="adminApp.parseExcelInput()">
@@ -297,12 +308,18 @@
                         <form onsubmit="adminApp.submitSingle(event)" class="space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
-                                    <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
+                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Subject (教科) / Order (順序)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="single-subject" required class="brutal-input flex-grow" placeholder="例: 地理探求">
+                                        <input type="number" id="single-subject-order" class="brutal-input w-20 text-center" placeholder="順序" title="教科の表示順">
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
-                                    <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
+                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Chapter (単元) / Order (順序)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="single-chapter" required class="brutal-input flex-grow" placeholder="例: 1-1 世界の姿">
+                                        <input type="number" id="single-chapter-order" class="brutal-input w-20 text-center" placeholder="順序" title="単元の表示順">
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -400,7 +417,7 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
             import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
                 from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp, updateDoc } 
+            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp, updateDoc, deleteField } 
                 from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
             
             const firebaseConfig = {
@@ -586,17 +603,27 @@
                     if (state.parsedBulkData.length === 0) return;
                     nav.setLoading(true);
                     const isMath = $('excel-is-math').checked;
+                    
+                    const sOrderVal = $('excel-subject-order').value;
+                    const cOrderVal = $('excel-chapter-order').value;
+                    const subjectOrder = sOrderVal ? Number(sOrderVal) : null;
+                    const chapterOrder = cOrderVal ? Number(cOrderVal) : null;
+            
                     try {
                         const batch = writeBatch(db);
                         state.parsedBulkData.forEach(data => {
                             const newDocRef = doc(collection(db, 'questions'));
                             data.isMath = isMath;
+                            if (subjectOrder !== null) data.subjectOrder = subjectOrder;
+                            if (chapterOrder !== null) data.chapterOrder = chapterOrder;
                             batch.set(newDocRef, data);
                         });
                         await batch.commit();
                         alert(`${state.parsedBulkData.length} 件の問題を一括登録しました。`);
                         $('excel-input').value = '';
                         $('excel-is-math').checked = false;
+                        $('excel-subject-order').value = '';
+                        $('excel-chapter-order').value = '';
                         adminApp.parseExcelInput();
                         await adminApp.loadQuestions();
                     } catch (e) {
@@ -615,14 +642,25 @@
                     const aRaw = $('single-a').value.trim();
                     const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
                     const isMath = $('single-is-math').checked;
+                    
+                    const sOrderVal = $('single-subject-order').value;
+                    const cOrderVal = $('single-chapter-order').value;
+                    const subjectOrder = sOrderVal ? Number(sOrderVal) : null;
+                    const chapterOrder = cOrderVal ? Number(cOrderVal) : null;
             
                     nav.setLoading(true);
                     try {
-                        await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a, isMath });
+                        const docData = { subject, chapter, q, a, isMath };
+                        if (subjectOrder !== null) docData.subjectOrder = subjectOrder;
+                        if (chapterOrder !== null) docData.chapterOrder = chapterOrder;
+            
+                        await setDoc(doc(collection(db, 'questions')), docData);
                         alert("問題を追加しました。");
                         $('single-q').value = '';
                         $('single-a').value = '';
                         $('single-is-math').checked = false;
+                        $('single-subject-order').value = '';
+                        $('single-chapter-order').value = '';
                         await adminApp.loadQuestions();
                     } catch (e) {
                         alert("登録に失敗しました。");
@@ -672,23 +710,53 @@
                         return;
                     }
             
+                    
                     const grouped = {};
                     targetQuestions.forEach(q => {
-                        if (!grouped[q.subject]) grouped[q.subject] = {};
-                        if (!grouped[q.subject][q.chapter]) grouped[q.subject][q.chapter] = [];
-                        grouped[q.subject][q.chapter].push(q);
+                        if (!grouped[q.subject]) {
+                            grouped[q.subject] = {
+                                subjectOrder: q.subjectOrder !== undefined ? q.subjectOrder : 9999,
+                                chaptersMap: new Map()
+                            };
+                        }
+                        if (q.subjectOrder !== undefined && q.subjectOrder < grouped[q.subject].subjectOrder) {
+                            grouped[q.subject].subjectOrder = q.subjectOrder;
+                        }
+            
+                        if (!grouped[q.subject].chaptersMap.has(q.chapter)) {
+                            grouped[q.subject].chaptersMap.set(q.chapter, {
+                                order: q.chapterOrder !== undefined ? q.chapterOrder : 9999,
+                                questions: []
+                            });
+                        } else {
+                            if (q.chapterOrder !== undefined && q.chapterOrder < grouped[q.subject].chaptersMap.get(q.chapter).order) {
+                                grouped[q.subject].chaptersMap.get(q.chapter).order = q.chapterOrder;
+                            }
+                        }
+                        grouped[q.subject].chaptersMap.get(q.chapter).questions.push(q);
                     });
             
-                    Object.keys(grouped).sort().forEach(subject => {
+                    
+                    Object.keys(grouped)
+                    .map(name => ({ name, data: grouped[name] }))
+                    .sort((a, b) => a.data.subjectOrder - b.data.subjectOrder)
+                    .forEach(subjInfo => {
+                        const subject = subjInfo.name;
                         const subjDiv = document.createElement('div');
                         subjDiv.className = 'mb-8';
                         subjDiv.innerHTML = `<h4 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3 mb-4">${subject}</h4>`;
                         
-                        const chaptersObj = grouped[subject];
-                        Object.keys(chaptersObj).sort().forEach(chapter => {
+                        const chaptersObj = subjInfo.data.chaptersMap;
+                        
+                        
+                        Array.from(chaptersObj.entries())
+                        .map(([cName, cData]) => ({ name: cName, data: cData }))
+                        .sort((a, b) => a.data.order - b.data.order)
+                        .forEach(chapInfo => {
+                            const chapter = chapInfo.name;
+                            const qs = chapInfo.data.questions;
                             const chapterKey = `${subject}||${chapter}`;
                             const isExpanded = state.expandedChapters.has(chapterKey);
-                            const qs = chaptersObj[chapter];
             
                             const chapterDiv = document.createElement('div');
                             chapterDiv.className = 'brutal-box mb-4 bg-white';
@@ -718,12 +786,18 @@
                                             <form onsubmit="adminApp.saveEdit(event, '${q.id}')" class="w-full flex flex-col gap-3">
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <div>
-                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Subject</label>
-                                                        <input type="text" id="edit-subject-${q.id}" required class="brutal-input text-xs py-2" value="${q.subject}">
+                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Subject / Order</label>
+                                                        <div class="flex gap-2">
+                                                            <input type="text" id="edit-subject-${q.id}" required class="brutal-input text-xs py-2 flex-grow" value="${q.subject}">
+                                                            <input type="number" id="edit-subject-order-${q.id}" class="brutal-input text-xs py-2 w-16 text-center" value="${q.subjectOrder !== undefined ? q.subjectOrder : ''}" placeholder="順序">
+                                                        </div>
                                                     </div>
                                                     <div>
-                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Chapter</label>
-                                                        <input type="text" id="edit-chapter-${q.id}" required class="brutal-input text-xs py-2" value="${q.chapter}">
+                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Chapter / Order</label>
+                                                        <div class="flex gap-2">
+                                                            <input type="text" id="edit-chapter-${q.id}" required class="brutal-input text-xs py-2 flex-grow" value="${q.chapter}">
+                                                            <input type="number" id="edit-chapter-order-${q.id}" class="brutal-input text-xs py-2 w-16 text-center" value="${q.chapterOrder !== undefined ? q.chapterOrder : ''}" placeholder="順序">
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div>
@@ -800,9 +874,18 @@
                     const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
                     const isMath = $(`edit-is-math-${id}`).checked;
             
+                    const sOrderVal = $(`edit-subject-order-${id}`).value;
+                    const cOrderVal = $(`edit-chapter-order-${id}`).value;
+                    const subjectOrder = sOrderVal ? Number(sOrderVal) : deleteField();
+                    const chapterOrder = cOrderVal ? Number(cOrderVal) : deleteField();
+            
                     nav.setLoading(true);
                     try {
-                        await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a, isMath });
+                        await updateDoc(doc(db, 'questions', id), { 
+                            subject, chapter, q, a, isMath,
+                            subjectOrder: subjectOrder,
+                            chapterOrder: chapterOrder
+                        });
                         state.editingId = null;
                         await adminApp.loadQuestions();
                     } catch (err) {
