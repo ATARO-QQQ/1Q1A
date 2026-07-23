@@ -33,16 +33,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (text === undefined || text === null) return "";
                 let str = String(text);
                 
+                if (!isMath) {
+                    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                }
+
                 str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                
-                if (!isMath) return str;
 
                 
-                str = str.replace(/-&gt;/g, '→').replace(/\*/g, '×');
+                str = str.replace(/\*/g, '×').replace(/\
 
                 
-                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
-                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                str = str.replace(/'/g, '<span class="math-sup">′</span>');
+
+                
+                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '<span class="math-integral">∫</span><sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '<span class="math-integral">∑</span><sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
                 
                 
                 str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
@@ -53,9 +58,20 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
 
                 
-                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+                const tags = [];
+                str = str.replace(/<[^>]+>/g, match => {
+                    tags.push(match);
+                    return `___TAG${tags.length - 1}___`;
+                });
 
                 
+                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|c|f|g|r|e|t|u|C|A|B)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+
+                
+                tags.forEach((tag, i) => {
+                    str = str.replace(`___TAG${i}___`, tag);
+                });
+
                 return `<span class="math-content">${str}</span>`;
             }
         };
@@ -80,11 +96,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         
         const mathApp = {
             keys: [
-                { d: '7', i: '7' }, { d: '8', i: '8' }, { d: '9', i: '9' }, { d: '÷', i: '÷' }, { d: '(', i: '(' }, { d: ')', i: ')' },
-                { d: '4', i: '4' }, { d: '5', i: '5' }, { d: '6', i: '6' }, { d: '×', i: '×' }, { d: '√', i: '√(' }, { d: 'a^b', i: '^(' },
-                { d: '1', i: '1' }, { d: '2', i: '2' }, { d: '3', i: '3' }, { d: '-', i: '-' }, { d: '∫', i: '∫' }, { d: '∫[a~b]', i: '∫[ to ]' },
-                { d: '0', i: '0' }, { d: '.', i: '.' }, { d: '=', i: '=' }, { d: '+', i: '+' }, { d: '∑', i: '∑' }, { d: '∑[a~b]', i: '∑[ to ]' },
-                { d: '𝑥', i: 'x' }, { d: '𝑦', i: 'y' }, { d: 'n', i: 'n' }, { d: "'", i: "'" }, { d: 'a_b', i: '_(' }, { d: 'BS', i: 'BS' }
+                { d: '7', i: '7' }, { d: '8', i: '8' }, { d: '9', i: '9' }, { d: '÷', i: '/' }, { d: '(', i: '(' }, { d: ')', i: ')' },
+                { d: '4', i: '4' }, { d: '5', i: '5' }, { d: '6', i: '6' }, { d: '×', i: '*' }, { d: '√', i: '√(' }, { d: '■²', i: '^2' },
+                { d: '1', i: '1' }, { d: '2', i: '2' }, { d: '3', i: '3' }, { d: '-', i: '-' }, { d: '∫', i: '∫' }, { d: '■^■', i: '^(' },
+                { d: '0', i: '0' }, { d: '.', i: '.' }, { d: '=', i: '=' }, { d: '+', i: '+' }, { d: '∑', i: '∑' }, { d: '■_■', i: '_(' },
+                { d: '𝑥', i: 'x' }, { d: '𝑦', i: 'y' }, { d: '𝑛', i: 'n' }, { d: "′", i: "'" }, { d: '𝑒', i: 'e' }, { d: 'BS', i: 'BS' }
             ],
             render: () => {
                 const kb = $('math-keyboard');
@@ -97,8 +113,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                         btn.classList.add('danger');
                     }
                     
-                    if (k.d === '𝑥' || k.d === '𝑦' || k.d === 'n') {
-                        btn.innerHTML = `<span class="math-italic font-serif">${k.i}</span>`;
+                    if (k.d === '𝑥' || k.d === '𝑦' || k.d === '𝑛' || k.d === '𝑒') {
+                        btn.innerHTML = `<span class="math-italic font-serif">${k.d}</span>`;
                     } else {
                         btn.innerText = k.d;
                     }
@@ -136,6 +152,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     input.setSelectionRange(newCursorPos, newCursorPos);
                 }
                 input.focus();
+                quizApp.updatePreview();
             }
         };
 
@@ -262,10 +279,40 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     state.questionsDB = qs;
                     const grouped = {};
                     qs.forEach(q => {
-                        if (!grouped[q.subject]) grouped[q.subject] = new Set();
-                        grouped[q.subject].add(q.chapter);
+                        if (!grouped[q.subject]) {
+                            grouped[q.subject] = {
+                                subjectOrder: q.subjectOrder !== undefined ? q.subjectOrder : 9999,
+                                chaptersMap: new Map()
+                            };
+                        }
+                        
+                        if (q.subjectOrder !== undefined && q.subjectOrder < grouped[q.subject].subjectOrder) {
+                            grouped[q.subject].subjectOrder = q.subjectOrder;
+                        }
+
+                        if (!grouped[q.subject].chaptersMap.has(q.chapter)) {
+                            grouped[q.subject].chaptersMap.set(q.chapter, q.chapterOrder !== undefined ? q.chapterOrder : 9999);
+                        } else {
+                            if (q.chapterOrder !== undefined && q.chapterOrder < grouped[q.subject].chaptersMap.get(q.chapter)) {
+                                grouped[q.subject].chaptersMap.set(q.chapter, q.chapterOrder);
+                            }
+                        }
                     });
-                    state.subjects = Object.keys(grouped).map(name => ({ name, chapters: Array.from(grouped[name]).sort() }));
+                    
+                    
+                    state.subjects = Object.keys(grouped).map(subjName => {
+                        const subjData = grouped[subjName];
+                        const chaptersArray = Array.from(subjData.chaptersMap.entries()).map(([chapterName, order]) => ({
+                            name: chapterName,
+                            order: order
+                        })).sort((a, b) => a.order - b.order).map(c => c.name);
+
+                        return { 
+                            name: subjName, 
+                            order: subjData.subjectOrder,
+                            chapters: chaptersArray 
+                        };
+                    }).sort((a, b) => a.order - b.order);
                 } catch (e) { alert("データの読み込みに失敗しました。"); }
             },
             injectDummyData: async () => {
@@ -429,7 +476,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (chapter) targetQs = targetQs.filter(q => q.chapter === chapter);
                 if (targetQs.length === 0) return;
 
-                targetQs = targetQs.sort(() => Math.random() - 0.5);
+                if (chapter) {
+                    
+                    targetQs = targetQs.sort((a, b) => {
+                        const orderA = a.order !== undefined ? a.order : 0;
+                        const orderB = b.order !== undefined ? b.order : 0;
+                        return orderA - orderB;
+                    });
+                } else {
+                    
+                    targetQs = targetQs.sort(() => Math.random() - 0.5);
+                }
 
                 state.quiz = { 
                     questions: targetQs, 
@@ -451,6 +508,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 quizApp.renderQuestion();
             },
             
+            updatePreview: () => {
+                const currentQ = state.quiz.questions[state.quiz.currentIndex];
+                if (currentQ?.isMath) {
+                    const inputVal = $('quiz-answer-input').value;
+                    $('quiz-math-preview').innerHTML = utils.formatMath(inputVal, true);
+                }
+            },
+
             renderQuestion: () => {
                 const q = state.quiz;
                 q.isAnswered = false;
@@ -473,10 +538,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (currentQ.isMath) {
                     $('math-keyboard').classList.remove('hidden');
                     $('math-keyboard').classList.add('grid');
+                    $('quiz-math-preview').classList.remove('hidden');
+                    $('quiz-answer-input').classList.add('border-t-0'); 
                 } else {
                     $('math-keyboard').classList.add('hidden');
                     $('math-keyboard').classList.remove('grid');
+                    $('quiz-math-preview').classList.add('hidden');
+                    $('quiz-answer-input').classList.remove('border-t-0');
                 }
+                
+                quizApp.updatePreview();
 
                 setTimeout(() => $('quiz-answer-input').focus(), 50);
             },
@@ -485,7 +556,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 const normalize = (str) => {
                     let s = str.toLowerCase().replace(/[\s　]/g, '').replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
                     
-                    s = s.replace(/×/g, '*').replace(/÷/g, '/');
+                    s = s.replace(/×/g, '*').replace(/÷/g, '/').replace(/[’'‘´`′]/g, "'");
                     return s;
                 };
                 const normIn = normalize(input);
@@ -608,10 +679,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         window.authApp = authApp;
         window.quizApp = quizApp;
         window.dataApp = dataApp;
-        window.mathApp = mathApp; 
+        window.mathApp = mathApp;
 
-        
-        window.onload = () => { 
+        window.onload = () => {
             authApp.init();
             mathApp.render();
         };
