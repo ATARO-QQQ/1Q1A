@@ -1,963 +1,988 @@
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一問一答 - 1Q1A ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* === 先進的・近未来的ネオブルータリズム (サイズ調整版) === */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            margin: 0;
+            background-image: 
+                linear-gradient(#e2e8f0 1.5px, transparent 1.5px),
+                linear-gradient(90deg, #e2e8f0 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            background-position: center top;
+        }
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>一問一答 - 1Q1A ADMIN</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            body {
-                font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-                background-color: #f8fafc;
-                color: #0f172a;
-                min-height: 100vh;
-                margin: 0;
-                background-image:
-                    linear-gradient(#e2e8f0 1.5px, transparent 1.5px),
-                    linear-gradient(90deg, #e2e8f0 1.5px, transparent 1.5px);
-                background-size: 24px 24px;
-                background-position: center top;
-            }
+        .screen { display: none; }
+        .screen.active { display: block; animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
 
-            .screen {
-                display: none;
-            }
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
-            .screen.active {
-                display: block;
-                animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            }
+        /* 枠線と影を少し細く・小さく */
+        .brutal-box {
+            border: 2px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            background-color: #fff;
+            border-radius: 0;
+        }
 
-            @keyframes slideUp {
-                0% {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
+        /* ボタン定義 */
+        .brutal-btn {
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0px #000;
+            background-color: #fff;
+            color: #000;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.1s ease-out;
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .brutal-btn:hover:not(:disabled) {
+            background-color: #000;
+            color: #fff;
+        }
+        .brutal-btn:active:not(:disabled) {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px #000;
+        }
+        .brutal-btn.black {
+            background-color: #000;
+            color: #fff;
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0px #64748b;
+        }
+        .brutal-btn.black:hover:not(:disabled) {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 3px 3px 0px #000;
+        }
+        .brutal-btn.danger {
+            background-color: #fff;
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            box-shadow: 3px 3px 0px #dc2626;
+        }
+        .brutal-btn.danger:hover:not(:disabled) {
+            background-color: #dc2626;
+            color: #fff;
+            border-color: #000;
+            box-shadow: 3px 3px 0px #000;
+        }
+        .brutal-btn.danger:active:not(:disabled) {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px #000;
+        }
+        .brutal-btn:disabled {
+            border-color: #ccc;
+            box-shadow: 3px 3px 0px #ccc;
+            color: #999;
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-                100% {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+        /* 入力フォーム */
+        .brutal-input {
+            border: 2px solid #000;
+            background-color: #fff;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            border-radius: 0;
+            transition: all 0.15s;
+            font-weight: 700;
+            box-shadow: inset 3px 3px 0px rgba(0,0,0,0.03);
+        }
+        .brutal-input:focus {
+            background-color: #fefce8;
+            border-color: #000;
+            box-shadow: inset 4px 4px 0px rgba(0,0,0,0.08);
+        }
 
-            .brutal-box {
-                border: 2px solid #000;
-                box-shadow: 4px 4px 0px #000;
-                background-color: #fff;
-                border-radius: 0;
-            }
+        /* タブUI */
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0px #000;
+            padding: 10px 16px;
+            font-weight: 800;
+            background-color: #fff;
+            color: #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.1s ease-out;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .tab-btn.active {
+            background-color: #000;
+            color: #fff;
+            box-shadow: 0px 0px 0px #000;
+            transform: translate(3px, 3px);
+        }
 
-            .brutal-btn {
-                border: 2px solid #000;
-                box-shadow: 3px 3px 0px #000;
-                background-color: #fff;
-                color: #000;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                cursor: pointer;
-                transition: all 0.1s ease-out;
-                border-radius: 0;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-            }
+        /* 数学表示用スタイル */
+        .math-content {
+            font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+            letter-spacing: 0.05em;
+        }
+        .math-italic {
+            font-style: italic;
+        }
+        .math-sup {
+            font-size: 0.6em;
+            vertical-align: super;
+            line-height: 0;
+        }
+        .math-sub {
+            font-size: 0.6em;
+            vertical-align: sub;
+            line-height: 0;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
 
-            .brutal-btn:hover:not(:disabled) {
-                background-color: #000;
-                color: #fff;
-            }
+    <!-- ローディング -->
+    <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-lg tracking-widest flex-col gap-3">
+        <div class="animate-spin h-8 w-8 border-4 border-black border-t-transparent"></div>
+        <p class="uppercase font-black tracking-[0.2em]">Loading</p>
+    </div>
 
-            .brutal-btn:active:not(:disabled) {
-                transform: translate(3px, 3px);
-                box-shadow: 0px 0px 0px #000;
-            }
+    <!-- ヘッダー -->
+    <header id="header" class="hidden w-full max-w-5xl px-4 md:px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-3 border-b-2 border-black bg-white sticky top-0 z-40 shadow-[0_4px_0_0_#f8fafc]">
+        <div class="text-center md:text-left flex items-baseline gap-3">
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight uppercase">1Q1A ADMIN.</h1>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] hidden sm:block">Authoring System</p>
+        </div>
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 text-xs font-bold uppercase tracking-widest">
+            <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
+            <button onclick="nav.go('students')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">STUDENTS</button>
+            <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
+            <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
+        </nav>
+    </header>
 
-            .brutal-btn.black {
-                background-color: #000;
-                color: #fff;
-                border: 2px solid #000;
-                box-shadow: 3px 3px 0px #64748b;
-            }
+    <main class="w-full max-w-5xl p-4 md:p-6 flex-grow">
 
-            .brutal-btn.black:hover:not(:disabled) {
-                background-color: #fff;
-                color: #000;
-                box-shadow: 3px 3px 0px #000;
-            }
+        <!-- 1. 認証画面（作問者ログインのみ） -->
+        <div id="screen-auth" class="screen w-full max-w-sm mx-auto mt-8 md:mt-16">
+            <div class="brutal-box p-6 md:p-8">
+                <h2 class="text-2xl font-black mb-2 text-center uppercase tracking-[0.1em]">Admin Login</h2>
+                <p class="text-[10px] text-center text-gray-500 mb-8 font-bold tracking-widest">作問ユーザー専用ポータル</p>
+                
+                <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6 tracking-wide leading-relaxed border-2 border-black"></div>
 
-            .brutal-btn.danger {
-                background-color: #fff;
-                color: #dc2626;
-                border: 2px solid #dc2626;
-                box-shadow: 3px 3px 0px #dc2626;
-            }
-
-            .brutal-btn.danger:hover:not(:disabled) {
-                background-color: #dc2626;
-                color: #fff;
-                border-color: #000;
-                box-shadow: 3px 3px 0px #000;
-            }
-
-            .brutal-btn.danger:active:not(:disabled) {
-                transform: translate(3px, 3px);
-                box-shadow: 0px 0px 0px #000;
-            }
-
-            .brutal-btn:disabled {
-                border-color: #ccc;
-                box-shadow: 3px 3px 0px #ccc;
-                color: #999;
-                background-color: #f3f4f6;
-                cursor: not-allowed;
-                transform: none;
-            }
-
-            .brutal-input {
-                border: 2px solid #000;
-                background-color: #fff;
-                padding: 10px 14px;
-                font-size: 0.95rem;
-                width: 100%;
-                outline: none;
-                border-radius: 0;
-                transition: all 0.15s;
-                font-weight: 700;
-                box-shadow: inset 3px 3px 0px rgba(0, 0, 0, 0.03);
-            }
-
-            .brutal-input:focus {
-                background-color: #fefce8;
-                border-color: #000;
-                box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.08);
-            }
-
-            .tab-container {
-                display: flex;
-                gap: 8px;
-                margin-bottom: 20px;
-            }
-
-            .tab-btn {
-                flex: 1;
-                border: 2px solid #000;
-                box-shadow: 3px 3px 0px #000;
-                padding: 10px 16px;
-                font-weight: 800;
-                background-color: #fff;
-                color: #000;
-                cursor: pointer;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                transition: all 0.1s ease-out;
-                text-align: center;
-                font-size: 0.875rem;
-            }
-
-            .tab-btn.active {
-                background-color: #000;
-                color: #fff;
-                box-shadow: 0px 0px 0px #000;
-                transform: translate(3px, 3px);
-            }
-
-            .status-badge {
-                font-weight: 900;
-                padding: 2px 6px;
-                font-size: 0.65rem;
-                text-transform: uppercase;
-                border: 1px solid #000;
-            }
-        </style>
-    </head>
-
-    <body class="flex flex-col items-center">
-
-
-        <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-lg tracking-widest flex-col gap-3">
-            <div class="animate-spin h-8 w-8 border-4 border-black border-t-transparent"></div>
-            <p class="uppercase font-black tracking-[0.2em]">Loading</p>
+                <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block font-black mb-1.5 uppercase text-[10px] tracking-[0.1em] text-gray-600">Admin Email</label>
+                        <input type="email" id="auth-email" required class="brutal-input" placeholder="admin@example.com">
+                    </div>
+                    <div>
+                        <label class="block font-black mb-1.5 uppercase text-[10px] tracking-[0.1em] text-gray-600">Password</label>
+                        <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="brutal-btn black w-full py-3 text-sm md:text-base mt-6">
+                        SIGN IN
+                    </button>
+                </form>
+            </div>
         </div>
 
-
-        <header id="header" class="hidden w-full max-w-5xl px-4 md:px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-3 border-b-2 border-black bg-white sticky top-0 z-40 shadow-[0_4px_0_0_#f8fafc]">
-            <div class="text-center md:text-left flex items-baseline gap-3">
-                <h1 class="text-2xl md:text-3xl font-black tracking-tight uppercase">1Q1A ADMIN.</h1>
-                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] hidden sm:block">Authoring System</p>
-            </div>
-            <nav class="flex flex-wrap justify-center gap-2 md:gap-4 text-xs font-bold uppercase tracking-widest">
-                <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
-                <button onclick="nav.go('students')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">STUDENTS</button>
-                <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
-                <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
-            </nav>
-        </header>
-
-        <main class="w-full max-w-5xl p-4 md:p-6 flex-grow">
-
-
-            <div id="screen-auth" class="screen w-full max-w-sm mx-auto mt-8 md:mt-16">
-                <div class="brutal-box p-6 md:p-8">
-                    <h2 class="text-2xl font-black mb-2 text-center uppercase tracking-[0.1em]">Admin Login</h2>
-                    <p class="text-[10px] text-center text-gray-500 mb-8 font-bold tracking-widest">作問ユーザー専用ポータル</p>
-
-                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6 tracking-wide leading-relaxed border-2 border-black"></div>
-
-                    <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-5">
-                        <div>
-                            <label class="block font-black mb-1.5 uppercase text-[10px] tracking-[0.1em] text-gray-600">Admin Email</label>
-                            <input type="email" id="auth-email" required class="brutal-input" placeholder="admin@example.com">
-                        </div>
-                        <div>
-                            <label class="block font-black mb-1.5 uppercase text-[10px] tracking-[0.1em] text-gray-600">Password</label>
-                            <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••">
-                        </div>
-                        <button type="submit" class="brutal-btn black w-full py-3 text-sm md:text-base mt-6">
-                            SIGN IN
-                        </button>
-                    </form>
+        <!-- 2. 問題管理画面 -->
+        <div id="screen-questions" class="screen w-full">
+            <!-- 作問エリア -->
+            <div class="mb-12">
+                <div class="tab-container flex-col sm:flex-row">
+                    <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-xs md:text-sm">Bulk Import (Excel)</button>
+                    <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn text-xs md:text-sm">Single Entry</button>
                 </div>
-            </div>
 
-
-            <div id="screen-questions" class="screen w-full">
-
-                <div class="mb-12">
-                    <div class="tab-container flex-col sm:flex-row">
-                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-xs md:text-sm">Bulk Import (Excel)</button>
-                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn text-xs md:text-sm">Single Entry</button>
+                <!-- Tab A: Excel / TSV 貼り付け -->
+                <div id="tab-excel" class="brutal-box p-5 md:p-8 bg-white">
+                    <h3 class="font-black text-lg md:text-xl mb-3 uppercase tracking-[0.1em] border-l-4 border-black pl-3">Paste from Spreadsheet</h3>
+                    <div class="bg-gray-100 border-2 border-black p-3 mb-5">
+                        <p class="text-[10px] md:text-xs font-bold text-gray-600 leading-relaxed uppercase tracking-wider">
+                            列の順序 (タブ区切り): <br class="sm:hidden"/>
+                            <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">教科</span> &rarr;
+                            <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">単元</span> &rarr;
+                            <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">問題文</span> &rarr;
+                            <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">正解1</span> &rarr;
+                            <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">正解2(任意)</span>
+                        </p>
+                    </div>
+                    <textarea id="excel-input" class="brutal-input h-32 md:h-40 font-mono text-xs md:text-sm mb-6 leading-relaxed" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
+                    
+                    <!-- プレビューテーブル -->
+                    <div id="excel-preview-area" class="hidden mb-6">
+                        <h4 class="font-black text-xs uppercase text-black bg-gray-200 inline-block px-3 py-1.5 mb-3 tracking-[0.1em] border-2 border-black">Preview (<span id="preview-count">0</span> items)</h4>
+                        <div class="max-h-60 overflow-y-auto border-2 border-black bg-white">
+                            <table class="w-full text-left text-xs md:text-sm font-bold border-collapse">
+                                <thead class="bg-black text-white sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider">教科</th>
+                                        <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider">単元</th>
+                                        <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider w-1/3">問題文</th>
+                                        <th class="p-2 md:p-3 tracking-wider">正解キーワード</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-tbody" class="divide-y-2 divide-black"></tbody>
+                            </table>
+                        </div>
                     </div>
 
+                    <!-- 一括入力用 数学チェック -->
+                    <div class="mb-5 flex items-center">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" id="excel-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer" onchange="adminApp.parseExcelInput()">
+                            <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">この一括入力の問題を「数学系 (専用キーボード)」として登録する</span>
+                        </label>
+                    </div>
 
-                    <div id="tab-excel" class="brutal-box p-5 md:p-8 bg-white">
-                        <h3 class="font-black text-lg md:text-xl mb-3 uppercase tracking-[0.1em] border-l-4 border-black pl-3">Paste from Spreadsheet</h3>
-                        <div class="bg-gray-100 border-2 border-black p-3 mb-5">
-                            <p class="text-[10px] md:text-xs font-bold text-gray-600 leading-relaxed uppercase tracking-wider">
-                                列の順序 (タブ区切り): <br class="sm:hidden" />
-                                <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">教科</span> &rarr;
-                                <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">単元</span> &rarr;
-                                <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">問題文</span> &rarr;
-                                <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">正解1</span> &rarr;
-                                <span class="text-black font-black bg-white border border-black px-1.5 py-0.5 mx-0.5">正解2(任意)</span>
-                            </p>
-                        </div>
-                        <textarea id="excel-input" class="brutal-input h-32 md:h-40 font-mono text-xs md:text-sm mb-6 leading-relaxed" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
+                    <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em]">
+                        EXECUTE IMPORT
+                    </button>
+                </div>
 
-                        <div id="excel-preview-area" class="hidden mb-6">
-                            <h4 class="font-black text-xs uppercase text-black bg-gray-200 inline-block px-3 py-1.5 mb-3 tracking-[0.1em] border-2 border-black">Preview (<span id="preview-count">0</span> items)</h4>
-                            <div class="max-h-60 overflow-y-auto border-2 border-black bg-white">
-                                <table class="w-full text-left text-xs md:text-sm font-bold border-collapse">
-                                    <thead class="bg-black text-white sticky top-0 z-10">
-                                        <tr>
-                                            <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider">教科</th>
-                                            <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider">単元</th>
-                                            <th class="p-2 md:p-3 border-r-2 border-gray-700 tracking-wider w-1/3">問題文</th>
-                                            <th class="p-2 md:p-3 tracking-wider">正解キーワード</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="preview-tbody" class="divide-y-2 divide-black"></tbody>
-                                </table>
+                <!-- Tab B: 個別手入力 -->
+                <div id="tab-single" class="brutal-box p-5 md:p-8 bg-white hidden">
+                    <h3 class="font-black text-lg md:text-xl mb-6 uppercase tracking-[0.1em] border-l-4 border-black pl-3">Single Entry</h3>
+                    <form onsubmit="adminApp.submitSingle(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
+                                <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
+                            </div>
+                            <div>
+                                <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
+                                <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
                             </div>
                         </div>
-
-
-                        <div class="mb-5 flex items-center">
+                        <div>
+                            <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Question (問題文)</label>
+                            <textarea id="single-q" required class="brutal-input h-24" placeholder="問題文を入力..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
+                            <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
+                        </div>
+                        
+                        <!-- 個別入力用 数学チェック -->
+                        <div class="pt-2 flex items-center">
                             <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" id="excel-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer">
-                                <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">この一括入力の問題を「数学系 (専用キーボード)」として登録する</span>
+                                <input type="checkbox" id="single-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer">
+                                <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">「数学系 (専用キーボード)」として登録する</span>
                             </label>
                         </div>
 
-                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em]">
-                            EXECUTE IMPORT
-                        </button>
-                    </div>
-
-
-                    <div id="tab-single" class="brutal-box p-5 md:p-8 bg-white hidden">
-                        <h3 class="font-black text-lg md:text-xl mb-6 uppercase tracking-[0.1em] border-l-4 border-black pl-3">Single Entry</h3>
-                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
-                                    <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
-                                </div>
-                                <div>
-                                    <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
-                                    <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Question (問題文)</label>
-                                <textarea id="single-q" required class="brutal-input h-24" placeholder="問題文を入力..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
-                                <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
-                            </div>
-
-
-                            <div class="pt-2">
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <input type="checkbox" id="single-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer">
-                                    <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">「数学系 (専用キーボード)」として登録する</span>
-                                </label>
-                            </div>
-
-                            <button type="submit" class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em] mt-2">
-                                ADD QUESTION
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-
-                <div class="mb-16">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 border-b-2 border-black pb-3">
-                        <h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em]">Database (<span id="total-q-count">0</span>)</h3>
-                        <div class="w-full md:w-64">
-                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-input py-2 px-3 text-xs font-black uppercase bg-gray-50">
-                                <option value="">ALL SUBJECTS</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="questions-list" class="space-y-6">
-
-                    </div>
-                </div>
-            </div>
-
-
-            <div id="screen-students" class="screen w-full max-w-4xl mx-auto">
-                <h2 class="text-2xl md:text-3xl font-black mb-4 uppercase tracking-[0.1em] border-l-8 border-black pl-4">Student Logs</h2>
-                <p class="text-[10px] md:text-xs font-bold text-gray-500 mb-8 tracking-widest pl-1">解くユーザーの学習状況と履歴を確認します。</p>
-
-                <div class="brutal-box p-5 md:p-6 bg-white mb-8">
-                    <label class="block font-black text-[10px] md:text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">Search by Name (名前で検索)</label>
-                    <div class="flex gap-4">
-                        <input type="text" id="search-student-name" class="brutal-input flex-grow" placeholder="生徒の表示名を入力..." oninput="adminApp.renderStudentsList()">
-                    </div>
-                </div>
-
-                <div id="students-list" class="space-y-4">
-
-                </div>
-            </div>
-
-
-            <div id="screen-users" class="screen w-full max-w-2xl mx-auto">
-                <h2 class="text-2xl md:text-3xl font-black mb-3 uppercase tracking-[0.1em] border-l-4 border-black pl-4">ID Manager</h2>
-                <p class="text-[10px] md:text-xs font-bold text-gray-600 mb-8 tracking-widest pl-1">新しい作問ユーザーの発行・管理を行います。</p>
-
-                <div class="brutal-box p-6 md:p-8 mb-10 bg-white">
-                    <h3 class="font-black text-lg mb-6 uppercase border-b-2 border-black pb-2 tracking-[0.1em]">Create New Admin</h3>
-                    <form onsubmit="adminApp.createUser(event)" class="space-y-5">
-                        <div>
-                            <label class="block font-black text-[10px] uppercase text-gray-500 mb-1.5 tracking-[0.1em]">New Email</label>
-                            <input type="email" id="new-user-email" required class="brutal-input" placeholder="new_author@example.com">
-                        </div>
-                        <div>
-                            <label class="block font-black text-[10px] uppercase text-gray-500 mb-1.5 tracking-[0.1em]">Initial Password</label>
-                            <input type="password" id="new-user-password" required minlength="6" class="brutal-input" placeholder="••••••••">
-                        </div>
                         <button type="submit" class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em] mt-2">
-                            CREATE ACCOUNT
+                            ADD QUESTION
                         </button>
                     </form>
                 </div>
+            </div>
 
-                <div>
-                    <h3 class="font-black text-sm mb-4 uppercase text-black bg-gray-200 inline-block px-3 py-1.5 border-2 border-black tracking-[0.1em]">Registered Admins</h3>
-                    <ul id="admin-users-list" class="space-y-3">
+            <!-- 登録済み問題一覧・検索・削除（アコーディオン表示） -->
+            <div class="mb-16">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 border-b-2 border-black pb-3">
+                    <h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em]">Database (<span id="total-q-count">0</span>)</h3>
+                    <div class="w-full md:w-64">
+                        <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-input py-2 px-3 text-xs font-black uppercase bg-gray-50">
+                            <option value="">ALL SUBJECTS</option>
+                        </select>
+                    </div>
+                </div>
 
-                    </ul>
+                <div id="questions-list" class="space-y-6">
+                    <!-- JSで動的に追加 -->
                 </div>
             </div>
 
-        </main>
+        </div>
 
-        <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-            import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
-                from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp, updateDoc } 
-                from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-            
-            const firebaseConfig = {
-                apiKey: "AIzaSyAYatcV4UyTrn4_Wf2HVzdIwM97buXGxLA",
-                authDomain: "agenthtml-5f5fb.firebaseapp.com",
-                projectId: "agenthtml-5f5fb",
-                storageBucket: "agenthtml-5f5fb.firebasestorage.app",
-                messagingSenderId: "880525619742",
-                appId: "1:880525619742:web:fd6cb57926abb4f5ddb40f",
-                measurementId: "G-L8906M810M"
-            };
-            
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            
-            const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
-            const secondaryAuth = getAuth(secondaryApp);
-            
-            const state = {
-                user: null,
-                questions: [],
-                adminUsers: [],
-                students: [],
-                parsedBulkData: [],
-                expandedChapters: new Set(),
-                editingId: null
-            };
-            
-            const $ = (id) => document.getElementById(id);
-            
-            const nav = {
-                screens: ['auth', 'questions', 'students', 'users'],
-                go: (targetScreen) => {
-                    nav.screens.forEach(s => {
-                        const el = $(`screen-${s}`);
-                        if (el) el.classList.toggle('active', s === targetScreen);
-                    });
-                    $('header').classList.toggle('hidden', targetScreen === 'auth');
-                    
-                    if (targetScreen === 'questions') adminApp.loadQuestions();
-                    if (targetScreen === 'students') adminApp.loadStudents();
-                    if (targetScreen === 'users') adminApp.loadAdminUsers();
-                },
-                setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
-            };
-            
-            const authApp = {
-                init: () => {
-                    onAuthStateChanged(auth, async (user) => {
-                        nav.setLoading(true);
-                        if (user) {
-                            const isAdmin = await authApp.checkAdminRole(user.uid);
-                            if (isAdmin) {
-                                state.user = user;
-                                nav.go('questions');
-                            } else {
-                                alert("作問権限がありません。管理者アカウントでログインしてください。");
-                                await signOut(auth);
-                                nav.go('auth');
-                            }
+        <!-- 3. 生徒管理画面 (STUDENT LOGS) -->
+        <div id="screen-students" class="screen w-full max-w-4xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-black mb-4 uppercase tracking-[0.1em] border-l-8 border-black pl-4">Student Logs</h2>
+            <p class="text-[10px] md:text-xs font-bold text-gray-500 mb-8 tracking-widest pl-1">解くユーザーの学習状況と履歴を確認します。</p>
+
+            <div class="brutal-box p-5 md:p-6 bg-white mb-8">
+                <label class="block font-black text-[10px] md:text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">Search by Name (名前で検索)</label>
+                <div class="flex gap-4">
+                    <input type="text" id="search-student-name" class="brutal-input flex-grow" placeholder="生徒の表示名を入力..." oninput="adminApp.renderStudentsList()">
+                </div>
+            </div>
+
+            <div id="students-list" class="space-y-4">
+                <!-- JSで動的生成 -->
+            </div>
+        </div>
+
+        <!-- 4. ID管理画面 -->
+        <div id="screen-users" class="screen w-full max-w-2xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-black mb-3 uppercase tracking-[0.1em] border-l-4 border-black pl-4">ID Manager</h2>
+            <p class="text-[10px] md:text-xs font-bold text-gray-600 mb-8 tracking-widest pl-1">新しい作問ユーザーの発行・管理を行います。</p>
+
+            <div class="brutal-box p-6 md:p-8 mb-10 bg-white">
+                <h3 class="font-black text-lg mb-6 uppercase border-b-2 border-black pb-2 tracking-[0.1em]">Create New Admin</h3>
+                <form onsubmit="adminApp.createUser(event)" class="space-y-5">
+                    <div>
+                        <label class="block font-black text-[10px] uppercase text-gray-500 mb-1.5 tracking-[0.1em]">New Email</label>
+                        <input type="email" id="new-user-email" required class="brutal-input" placeholder="new_author@example.com">
+                    </div>
+                    <div>
+                        <label class="block font-black text-[10px] uppercase text-gray-500 mb-1.5 tracking-[0.1em]">Initial Password</label>
+                        <input type="password" id="new-user-password" required minlength="6" class="brutal-input" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em] mt-2">
+                        CREATE ACCOUNT
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                <h3 class="font-black text-sm mb-4 uppercase text-black bg-gray-200 inline-block px-3 py-1.5 border-2 border-black tracking-[0.1em]">Registered Admins</h3>
+                <ul id="admin-users-list" class="space-y-3">
+                    <!-- JS -->
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
+            from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp, updateDoc } 
+            from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYatcV4UyTrn4_Wf2HVzdIwM97buXGxLA",
+            authDomain: "agenthtml-5f5fb.firebaseapp.com",
+            projectId: "agenthtml-5f5fb",
+            storageBucket: "agenthtml-5f5fb.firebasestorage.app",
+            messagingSenderId: "880525619742",
+            appId: "1:880525619742:web:fd6cb57926abb4f5ddb40f",
+            measurementId: "G-L8906M810M"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+        const secondaryAuth = getAuth(secondaryApp);
+
+        const state = {
+            user: null,
+            questions: [],
+            adminUsers: [],
+            students: [],
+            parsedBulkData: [],
+            expandedChapters: new Set(),
+            editingId: null
+        };
+
+        const $ = (id) => document.getElementById(id);
+
+        // 文字列整形ユーティリティ (解くページと共通の数学レンダリング処理)
+        const utils = {
+            formatMath: (text, isMath) => {
+                if (text === undefined || text === null) return "";
+                let str = String(text);
+                // HTMLエスケープ (XSS対策)
+                str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                if (!isMath) return str;
+
+                // 矢印と掛け算の置換
+                str = str.replace(/-&gt;/g, '→').replace(/\*/g, '×');
+
+                // 定積分・シグマの置換: ∫[a to b] -> ∫(上付きb)(下付きa)
+                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                
+                // 上付き文字
+                str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
+                str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
+                
+                // 下付き文字
+                str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
+                str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
+
+                // 変数 (x, y, n, a, b, etc...) を数学らしい斜体にする
+                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+
+                // 数学系の問題全体をセリフ体に
+                return `<span class="math-content">${str}</span>`;
+            }
+        };
+
+        const nav = {
+            screens: ['auth', 'questions', 'students', 'users'],
+            go: (targetScreen) => {
+                nav.screens.forEach(s => {
+                    const el = $(`screen-${s}`);
+                    if (el) el.classList.toggle('active', s === targetScreen);
+                });
+                $('header').classList.toggle('hidden', targetScreen === 'auth');
+                
+                if (targetScreen === 'questions') adminApp.loadQuestions();
+                if (targetScreen === 'students') adminApp.loadStudents();
+                if (targetScreen === 'users') adminApp.loadAdminUsers();
+            },
+            setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
+        };
+
+        const authApp = {
+            init: () => {
+                onAuthStateChanged(auth, async (user) => {
+                    nav.setLoading(true);
+                    if (user) {
+                        const isAdmin = await authApp.checkAdminRole(user.uid);
+                        if (isAdmin) {
+                            state.user = user;
+                            nav.go('questions');
                         } else {
-                            state.user = null;
+                            alert("作問権限がありません。管理者アカウントでログインしてください。");
+                            await signOut(auth);
                             nav.go('auth');
                         }
-                        nav.setLoading(false);
-                    });
-                },
-                checkAdminRole: async (uid) => {
-                    const userDocRef = doc(db, 'admin_users', uid);
-                    try {
-                        const snap = await getDoc(userDocRef);
-                        if (snap.exists()) return true;
-                    } catch (e) {
-                        console.log("既存データ参照なし。新規登録を試行します。");
+                    } else {
+                        state.user = null;
+                        nav.go('auth');
                     }
-                    try {
-                        await setDoc(userDocRef, { email: auth.currentUser?.email || '', createdAt: serverTimestamp() });
-                        return true;
-                    } catch (err) {
-                        console.error("管理者登録失敗:", err);
-                        return false;
-                    }
-                },
-                handleLogin: async (e) => {
-                    e.preventDefault();
-                    const email = $('auth-email').value;
-                    const password = $('auth-password').value;
-                    try {
-                        $('auth-error').classList.add('hidden');
-                        nav.setLoading(true);
-                        await signInWithEmailAndPassword(auth, email, password);
-                    } catch (err) {
-                        nav.setLoading(false);
-                        $('auth-error').innerText = 'ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。';
-                        $('auth-error').classList.remove('hidden');
-                    }
-                },
-                logout: () => signOut(auth)
-            };
-            
-            const adminApp = {
-                switchTab: (tab) => {
-                    $('tab-excel').classList.toggle('hidden', tab !== 'excel');
-                    $('tab-single').classList.toggle('hidden', tab !== 'single');
-                    $('tab-excel-btn').classList.toggle('active', tab === 'excel');
-                    $('tab-single-btn').classList.toggle('active', tab === 'single');
-                },
-            
+                    nav.setLoading(false);
+                });
+            },
+            checkAdminRole: async (uid) => {
+                const userDocRef = doc(db, 'admin_users', uid);
+                try {
+                    const snap = await getDoc(userDocRef);
+                    if (snap.exists()) return true;
+                } catch (e) {
+                    console.log("既存データ参照なし。新規登録を試行します。");
+                }
+                try {
+                    await setDoc(userDocRef, { email: auth.currentUser?.email || '', createdAt: serverTimestamp() });
+                    return true;
+                } catch (err) {
+                    console.error("管理者登録失敗:", err);
+                    return false;
+                }
+            },
+            handleLogin: async (e) => {
+                e.preventDefault();
+                const email = $('auth-email').value;
+                const password = $('auth-password').value;
+                try {
+                    $('auth-error').classList.add('hidden');
+                    nav.setLoading(true);
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (err) {
+                    nav.setLoading(false);
+                    $('auth-error').innerText = 'ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。';
+                    $('auth-error').classList.remove('hidden');
+                }
+            },
+            logout: () => signOut(auth)
+        };
+
+        const adminApp = {
+            switchTab: (tab) => {
+                $('tab-excel').classList.toggle('hidden', tab !== 'excel');
+                $('tab-single').classList.toggle('hidden', tab !== 'single');
+                $('tab-excel-btn').classList.toggle('active', tab === 'excel');
+                $('tab-single-btn').classList.toggle('active', tab === 'single');
+            },
+
+            // ===== 問題管理機能 =====
+            parseExcelInput: () => {
+                const text = $('excel-input').value.trim();
+                if (!text) {
+                    $('excel-preview-area').classList.add('hidden');
+                    $('excel-submit-btn').disabled = true;
+                    state.parsedBulkData = [];
+                    return;
+                }
                 
-                parseExcelInput: () => {
-                    const text = $('excel-input').value.trim();
-                    if (!text) {
-                        $('excel-preview-area').classList.add('hidden');
-                        $('excel-submit-btn').disabled = true;
-                        state.parsedBulkData = [];
-                        return;
+                const isMath = $('excel-is-math').checked;
+                const lines = text.split('\n');
+                const parsed = [];
+                lines.forEach(line => {
+                    const row = line.split('\t').map(cell => cell.trim()).filter(c => c !== '');
+                    if (row.length >= 4) {
+                        parsed.push({ subject: row[0], chapter: row[1], q: row[2], a: row.slice(3) });
                     }
-                    const lines = text.split('\n');
-                    const parsed = [];
-                    lines.forEach(line => {
-                        const row = line.split('\t').map(cell => cell.trim()).filter(c => c !== '');
-                        if (row.length >= 4) {
-                            parsed.push({ subject: row[0], chapter: row[1], q: row[2], a: row.slice(3) });
-                        }
+                });
+                state.parsedBulkData = parsed;
+                $('preview-count').innerText = parsed.length;
+
+                const tbody = $('preview-tbody');
+                tbody.innerHTML = '';
+                parsed.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-100 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-2 border-r-2 border-gray-300 font-bold">${item.subject}</td>
+                        <td class="p-2 border-r-2 border-gray-300 font-bold">${item.chapter}</td>
+                        <td class="p-2 border-r-2 border-gray-300 break-words">${utils.formatMath(item.q, isMath)}</td>
+                        <td class="p-2 font-bold text-gray-700">${item.a.map(a => utils.formatMath(a, isMath)).join(' / ')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                $('excel-preview-area').classList.remove('hidden');
+                $('excel-submit-btn').disabled = parsed.length === 0;
+            },
+
+            submitBulk: async () => {
+                if (state.parsedBulkData.length === 0) return;
+                nav.setLoading(true);
+                const isMath = $('excel-is-math').checked;
+                try {
+                    const batch = writeBatch(db);
+                    state.parsedBulkData.forEach(data => {
+                        const newDocRef = doc(collection(db, 'questions'));
+                        data.isMath = isMath;
+                        batch.set(newDocRef, data);
                     });
-                    state.parsedBulkData = parsed;
-                    $('preview-count').innerText = parsed.length;
-            
-                    const tbody = $('preview-tbody');
-                    tbody.innerHTML = '';
-                    parsed.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-gray-100 transition-colors';
-                        tr.innerHTML = `
-                            <td class="p-2 border-r-2 border-gray-300 font-bold">${item.subject}</td>
-                            <td class="p-2 border-r-2 border-gray-300 font-bold">${item.chapter}</td>
-                            <td class="p-2 border-r-2 border-gray-300 break-words">${item.q}</td>
-                            <td class="p-2 font-bold text-gray-700">${item.a.join(' / ')}</td>
-                        `;
-                        tbody.appendChild(tr);
+                    await batch.commit();
+                    alert(`${state.parsedBulkData.length} 件の問題を一括登録しました。`);
+                    $('excel-input').value = '';
+                    $('excel-is-math').checked = false;
+                    adminApp.parseExcelInput();
+                    await adminApp.loadQuestions();
+                } catch (e) {
+                    alert("一括登録に失敗しました。");
+                    console.error(e);
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            submitSingle: async (e) => {
+                e.preventDefault();
+                const subject = $('single-subject').value.trim();
+                const chapter = $('single-chapter').value.trim();
+                const q = $('single-q').value.trim();
+                const aRaw = $('single-a').value.trim();
+                const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+                const isMath = $('single-is-math').checked;
+
+                nav.setLoading(true);
+                try {
+                    await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a, isMath });
+                    alert("問題を追加しました。");
+                    $('single-q').value = '';
+                    $('single-a').value = '';
+                    $('single-is-math').checked = false;
+                    await adminApp.loadQuestions();
+                } catch (e) {
+                    alert("登録に失敗しました。");
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            loadQuestions: async () => {
+                nav.setLoading(true);
+                try {
+                    const snap = await getDocs(collection(db, 'questions'));
+                    state.questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    $('total-q-count').innerText = state.questions.length;
+
+                    const subjects = Array.from(new Set(state.questions.map(q => q.subject))).sort();
+                    const filterSelect = $('filter-subject');
+                    const currentVal = filterSelect.value;
+                    filterSelect.innerHTML = '<option value="">ALL SUBJECTS</option>';
+                    subjects.forEach(subj => {
+                        const opt = document.createElement('option');
+                        opt.value = subj;
+                        opt.innerText = subj;
+                        filterSelect.appendChild(opt);
                     });
-                    $('excel-preview-area').classList.remove('hidden');
-                    $('excel-submit-btn').disabled = parsed.length === 0;
-                },
-            
-                submitBulk: async () => {
-                    if (state.parsedBulkData.length === 0) return;
-                    nav.setLoading(true);
-                    const isMath = $('excel-is-math').checked;
-                    try {
-                        const batch = writeBatch(db);
-                        state.parsedBulkData.forEach(data => {
-                            const newDocRef = doc(collection(db, 'questions'));
-                            data.isMath = isMath;
-                            batch.set(newDocRef, data);
-                        });
-                        await batch.commit();
-                        alert(`${state.parsedBulkData.length} 件の問題を一括登録しました。`);
-                        $('excel-input').value = '';
-                        $('excel-is-math').checked = false;
-                        adminApp.parseExcelInput();
-                        await adminApp.loadQuestions();
-                    } catch (e) {
-                        alert("一括登録に失敗しました。");
-                        console.error(e);
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                submitSingle: async (e) => {
-                    e.preventDefault();
-                    const subject = $('single-subject').value.trim();
-                    const chapter = $('single-chapter').value.trim();
-                    const q = $('single-q').value.trim();
-                    const aRaw = $('single-a').value.trim();
-                    const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
-                    const isMath = $('single-is-math').checked;
-            
-                    nav.setLoading(true);
-                    try {
-                        await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a, isMath });
-                        alert("問題を追加しました。");
-                        $('single-q').value = '';
-                        $('single-a').value = '';
-                        $('single-is-math').checked = false;
-                        await adminApp.loadQuestions();
-                    } catch (e) {
-                        alert("登録に失敗しました。");
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                loadQuestions: async () => {
-                    nav.setLoading(true);
-                    try {
-                        const snap = await getDocs(collection(db, 'questions'));
-                        state.questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                        $('total-q-count').innerText = state.questions.length;
-            
-                        const subjects = Array.from(new Set(state.questions.map(q => q.subject))).sort();
-                        const filterSelect = $('filter-subject');
-                        const currentVal = filterSelect.value;
-                        filterSelect.innerHTML = '<option value="">ALL SUBJECTS</option>';
-                        subjects.forEach(subj => {
-                            const opt = document.createElement('option');
-                            opt.value = subj;
-                            opt.innerText = subj;
-                            filterSelect.appendChild(opt);
-                        });
-                        filterSelect.value = currentVal;
-                        adminApp.renderQuestionsList();
-                    } catch (e) {
-                        console.error(e);
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                renderQuestionsList: () => {
-                    const list = $('questions-list');
-                    list.innerHTML = '';
-                    const filterSubj = $('filter-subject').value;
-            
-                    let targetQuestions = state.questions;
-                    if (filterSubj) {
-                        targetQuestions = targetQuestions.filter(q => q.subject === filterSubj);
-                    }
-            
-                    if (targetQuestions.length === 0) {
-                        list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-[0.1em] border-2 border-black bg-gray-50 uppercase text-sm">No Questions Found</div>`;
-                        return;
-                    }
-            
-                    const grouped = {};
-                    targetQuestions.forEach(q => {
-                        if (!grouped[q.subject]) grouped[q.subject] = {};
-                        if (!grouped[q.subject][q.chapter]) grouped[q.subject][q.chapter] = [];
-                        grouped[q.subject][q.chapter].push(q);
-                    });
-            
-                    Object.keys(grouped).sort().forEach(subject => {
-                        const subjDiv = document.createElement('div');
-                        subjDiv.className = 'mb-8';
-                        subjDiv.innerHTML = `<h4 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3 mb-4">${subject}</h4>`;
-                        
-                        const chaptersObj = grouped[subject];
-                        Object.keys(chaptersObj).sort().forEach(chapter => {
-                            const chapterKey = `${subject}||${chapter}`;
-                            const isExpanded = state.expandedChapters.has(chapterKey);
-                            const qs = chaptersObj[chapter];
-            
-                            const chapterDiv = document.createElement('div');
-                            chapterDiv.className = 'brutal-box mb-4 bg-white';
-                            
-                            const headerBtn = document.createElement('button');
-                            headerBtn.className = 'w-full p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-2 sm:gap-0 focus:outline-none';
-                            headerBtn.onclick = () => {
-                                if (state.expandedChapters.has(chapterKey)) state.expandedChapters.delete(chapterKey);
-                                else state.expandedChapters.add(chapterKey);
-                                adminApp.renderQuestionsList();
-                            };
-                            headerBtn.innerHTML = `
-                                <span class="font-black text-sm md:text-base uppercase">${chapter}</span>
-                                <span class="font-bold border-2 border-black bg-white text-black px-2 py-1 text-[10px] md:text-xs uppercase whitespace-nowrap">${qs.length} Q <span class="ml-2 font-black">${isExpanded ? '▲' : '▼'}</span></span>
-                            `;
-                            chapterDiv.appendChild(headerBtn);
-            
-                            if (isExpanded) {
-                                const contentDiv = document.createElement('div');
-                                contentDiv.className = 'p-4 border-t-2 border-black bg-gray-50 space-y-3';
-                                qs.forEach(q => {
-                                    const qCard = document.createElement('div');
-                                    qCard.className = 'border-2 border-black p-3 md:p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4';
-                                    
-                                    if (state.editingId === q.id) {
-                                        qCard.innerHTML = `
-                                            <form onsubmit="adminApp.saveEdit(event, '${q.id}')" class="w-full flex flex-col gap-3">
-                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    <div>
-                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Subject</label>
-                                                        <input type="text" id="edit-subject-${q.id}" required class="brutal-input text-xs py-2" value="${q.subject}">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Chapter</label>
-                                                        <input type="text" id="edit-chapter-${q.id}" required class="brutal-input text-xs py-2" value="${q.chapter}">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Question</label>
-                                                    <textarea id="edit-q-${q.id}" required class="brutal-input text-xs py-2 h-16">${q.q}</textarea>
-                                                </div>
-                                                <div>
-                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Answers (カンマ区切り)</label>
-                                                    <input type="text" id="edit-a-${q.id}" required class="brutal-input text-xs py-2" value="${q.a.join(', ')}">
-                                                </div>
-                                                <!-- ここに追加：編集用 数学チェック -->
-                                                <div class="mt-1">
-                                                    <label class="flex items-center gap-2 cursor-pointer">
-                                                        <input type="checkbox" id="edit-is-math-${q.id}" class="w-4 h-4 border-2 border-black accent-black cursor-pointer" ${q.isMath ? 'checked' : ''}>
-                                                        <span class="font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-700">「数学系 (専用キーボード)」とする</span>
-                                                    </label>
-                                                </div>
-                                                <div class="flex justify-end gap-3 mt-2">
-                                                    <button type="button" onclick="adminApp.cancelEdit()" class="brutal-btn text-[10px] md:text-xs px-4 py-2">CANCEL</button>
-                                                    <button type="submit" class="brutal-btn black text-[10px] md:text-xs px-4 py-2">SAVE</button>
-                                                </div>
-                                            </form>
-                                        `;
-                                    } else {
-                                        
-                                        const mathBadge = q.isMath ? `<span class="bg-black text-white text-[10px] px-1.5 py-0.5 border-2 border-black tracking-widest uppercase mr-2 shadow-[2px_2px_0px_#ccc]">MATH</span>` : '';
-                                        
-                                        qCard.innerHTML = `
-                                            <div class="flex-grow w-full md:w-auto">
-                                                <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${mathBadge}${q.q}</p>
-                                                <p class="text-xs font-bold text-gray-700 bg-gray-100 p-2 border-2 border-dashed border-gray-300 inline-block">
-                                                    <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.join(' / ')}
-                                                </p>
-                                            </div>
-                                            <div class="flex gap-2 self-end md:self-center mt-2 md:mt-0 shrink-0">
-                                                <button onclick="adminApp.startEdit('${q.id}')" class="brutal-btn text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
-                                                    EDIT
-                                                </button>
-                                                <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
-                                                    DELETE
-                                                </button>
-                                            </div>
-                                        `;
-                                    }
-                                    contentDiv.appendChild(qCard);
-                                });
-                                chapterDiv.appendChild(contentDiv);
-                            }
-                            subjDiv.appendChild(chapterDiv);
-                        });
-                        list.appendChild(subjDiv);
-                    });
-                },
-            
-                deleteQuestion: async (id) => {
-                    if (!confirm("この問題を削除してもよろしいですか？")) return;
-                    nav.setLoading(true);
-                    try {
-                        await deleteDoc(doc(db, 'questions', id));
-                        await adminApp.loadQuestions();
-                    } catch (e) {
-                        alert("削除に失敗しました。");
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-                startEdit: (id) => { state.editingId = id; adminApp.renderQuestionsList(); },
-                cancelEdit: () => { state.editingId = null; adminApp.renderQuestionsList(); },
-                saveEdit: async (e, id) => {
-                    e.preventDefault();
-                    const subject = $(`edit-subject-${id}`).value.trim();
-                    const chapter = $(`edit-chapter-${id}`).value.trim();
-                    const q = $(`edit-q-${id}`).value.trim();
-                    const aRaw = $(`edit-a-${id}`).value.trim();
-                    const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
-                    const isMath = $(`edit-is-math-${id}`).checked;
-            
-                    nav.setLoading(true);
-                    try {
-                        await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a, isMath });
-                        state.editingId = null;
-                        await adminApp.loadQuestions();
-                    } catch (err) {
-                        alert("更新に失敗しました。");
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                
-                loadStudents: async () => {
-                    nav.setLoading(true);
-                    try {
-                        const snap = await getDocs(collection(db, 'users'));
-                        state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                        adminApp.renderStudentsList();
-                    } catch (e) {
-                        console.error("Student load error:", e);
-                        alert("生徒データの取得に失敗しました。Firestoreのルールが正しく更新されているか確認してください。");
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                renderStudentsList: () => {
-                    const list = $('students-list');
-                    list.innerHTML = '';
-                    const query = $('search-student-name').value.toLowerCase().trim();
-            
-                    let targets = state.students;
-                    if (query) {
-                        targets = targets.filter(s => (s.name || '').toLowerCase().includes(query));
-                    }
-            
-                    if (targets.length === 0) {
-                        list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-[0.1em] border-2 border-black bg-white uppercase text-sm">No Students Found</div>`;
-                        return;
-                    }
-            
-                    targets.forEach(student => {
-                        const stats = student.stats || {};
-                        const accuracy = stats.totalAnswered > 0 ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0;
-                        
-                        const card = document.createElement('div');
-                        card.className = 'brutal-box bg-white mb-4';
+                    filterSelect.value = currentVal;
+                    adminApp.renderQuestionsList();
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            renderQuestionsList: () => {
+                const list = $('questions-list');
+                list.innerHTML = '';
+                const filterSubj = $('filter-subject').value;
+
+                let targetQuestions = state.questions;
+                if (filterSubj) {
+                    targetQuestions = targetQuestions.filter(q => q.subject === filterSubj);
+                }
+
+                if (targetQuestions.length === 0) {
+                    list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-[0.1em] border-2 border-black bg-gray-50 uppercase text-sm">No Questions Found</div>`;
+                    return;
+                }
+
+                const grouped = {};
+                targetQuestions.forEach(q => {
+                    if (!grouped[q.subject]) grouped[q.subject] = {};
+                    if (!grouped[q.subject][q.chapter]) grouped[q.subject][q.chapter] = [];
+                    grouped[q.subject][q.chapter].push(q);
+                });
+
+                Object.keys(grouped).sort().forEach(subject => {
+                    const subjDiv = document.createElement('div');
+                    subjDiv.className = 'mb-8';
+                    subjDiv.innerHTML = `<h4 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3 mb-4">${subject}</h4>`;
+                    
+                    const chaptersObj = grouped[subject];
+                    Object.keys(chaptersObj).sort().forEach(chapter => {
+                        const chapterKey = `${subject}||${chapter}`;
+                        const isExpanded = state.expandedChapters.has(chapterKey);
+                        const qs = chaptersObj[chapter];
+
+                        const chapterDiv = document.createElement('div');
+                        chapterDiv.className = 'brutal-box mb-4 bg-white';
                         
                         const headerBtn = document.createElement('button');
-                        headerBtn.className = 'w-full p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-4 focus:outline-none';
-                        headerBtn.onclick = () => adminApp.toggleStudentLogs(student.id);
-                        
+                        headerBtn.className = 'w-full p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-2 sm:gap-0 focus:outline-none';
+                        headerBtn.onclick = () => {
+                            if (state.expandedChapters.has(chapterKey)) state.expandedChapters.delete(chapterKey);
+                            else state.expandedChapters.add(chapterKey);
+                            adminApp.renderQuestionsList();
+                        };
                         headerBtn.innerHTML = `
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-black text-white flex items-center justify-center font-black text-xl border-2 border-black shrink-0 shadow-[2px_2px_0px_#ccc]">
-                                    ${(student.name || '?').charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <p class="font-black text-lg md:text-xl uppercase">${student.name || 'No Name'}</p>
-                                    <p class="text-[10px] text-gray-500 font-mono tracking-widest mt-1">${student.email || 'No Email'}</p>
-                                </div>
+                            <span class="font-black text-sm md:text-base uppercase">${chapter}</span>
+                            <span class="font-bold border-2 border-black bg-white text-black px-2 py-1 text-[10px] md:text-xs uppercase whitespace-nowrap">${qs.length} Q <span class="ml-2 font-black">${isExpanded ? '▲' : '▼'}</span></span>
+                        `;
+                        chapterDiv.appendChild(headerBtn);
+
+                        if (isExpanded) {
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'p-4 border-t-2 border-black bg-gray-50 space-y-3';
+                            qs.forEach(q => {
+                                const qCard = document.createElement('div');
+                                qCard.className = 'border-2 border-black p-3 md:p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4';
+                                
+                                if (state.editingId === q.id) {
+                                    qCard.innerHTML = `
+                                        <form onsubmit="adminApp.saveEdit(event, '${q.id}')" class="w-full flex flex-col gap-3">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Subject</label>
+                                                    <input type="text" id="edit-subject-${q.id}" required class="brutal-input text-xs py-2" value="${q.subject}">
+                                                </div>
+                                                <div>
+                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Chapter</label>
+                                                    <input type="text" id="edit-chapter-${q.id}" required class="brutal-input text-xs py-2" value="${q.chapter}">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Question</label>
+                                                <textarea id="edit-q-${q.id}" required class="brutal-input text-xs py-2 h-16">${q.q}</textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Answers (カンマ区切り)</label>
+                                                <input type="text" id="edit-a-${q.id}" required class="brutal-input text-xs py-2" value="${q.a.join(', ')}">
+                                            </div>
+                                            <div class="mt-1 flex items-center">
+                                                <label class="flex items-center gap-2 cursor-pointer">
+                                                    <input type="checkbox" id="edit-is-math-${q.id}" class="w-4 h-4 border-2 border-black accent-black cursor-pointer" ${q.isMath ? 'checked' : ''}>
+                                                    <span class="font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-700">「数学系 (専用キーボード)」として登録する</span>
+                                                </label>
+                                            </div>
+                                            <div class="flex justify-end gap-3 mt-2">
+                                                <button type="button" onclick="adminApp.cancelEdit()" class="brutal-btn text-[10px] md:text-xs px-4 py-2">CANCEL</button>
+                                                <button type="submit" class="brutal-btn black text-[10px] md:text-xs px-4 py-2">SAVE</button>
+                                            </div>
+                                        </form>
+                                    `;
+                                } else {
+                                    const mathBadge = q.isMath ? `<span class="bg-black text-white text-[10px] px-1.5 py-0.5 border-2 border-black tracking-widest uppercase mr-2 shadow-[2px_2px_0px_#ccc]">MATH</span>` : '';
+                                    
+                                    qCard.innerHTML = `
+                                        <div class="flex-grow w-full md:w-auto">
+                                            <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${mathBadge}${utils.formatMath(q.q, q.isMath)}</p>
+                                            <p class="text-xs font-bold text-gray-700 bg-gray-100 p-2 border-2 border-dashed border-gray-300 inline-block">
+                                                <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.map(a => utils.formatMath(a, q.isMath)).join(' / ')}
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2 self-end md:self-center mt-2 md:mt-0 shrink-0">
+                                            <button onclick="adminApp.startEdit('${q.id}')" class="brutal-btn text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
+                                                EDIT
+                                            </button>
+                                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
+                                                DELETE
+                                            </button>
+                                        </div>
+                                    `;
+                                }
+                                contentDiv.appendChild(qCard);
+                            });
+                            chapterDiv.appendChild(contentDiv);
+                        }
+                        subjDiv.appendChild(chapterDiv);
+                    });
+                    list.appendChild(subjDiv);
+                });
+            },
+
+            deleteQuestion: async (id) => {
+                if (!confirm("この問題を削除してもよろしいですか？")) return;
+                nav.setLoading(true);
+                try {
+                    await deleteDoc(doc(db, 'questions', id));
+                    await adminApp.loadQuestions();
+                } catch (e) {
+                    alert("削除に失敗しました。");
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            startEdit: (id) => { state.editingId = id; adminApp.renderQuestionsList(); },
+            cancelEdit: () => { state.editingId = null; adminApp.renderQuestionsList(); },
+            saveEdit: async (e, id) => {
+                e.preventDefault();
+                const subject = $(`edit-subject-${id}`).value.trim();
+                const chapter = $(`edit-chapter-${id}`).value.trim();
+                const q = $(`edit-q-${id}`).value.trim();
+                const aRaw = $(`edit-a-${id}`).value.trim();
+                const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+                const isMath = $(`edit-is-math-${id}`).checked;
+
+                nav.setLoading(true);
+                try {
+                    await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a, isMath });
+                    state.editingId = null;
+                    await adminApp.loadQuestions();
+                } catch (err) {
+                    alert("更新に失敗しました。");
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            // ===== 生徒管理 (STUDENT LOGS) =====
+            loadStudents: async () => {
+                nav.setLoading(true);
+                try {
+                    const snap = await getDocs(collection(db, 'users'));
+                    state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    adminApp.renderStudentsList();
+                } catch (e) {
+                    console.error("Student load error:", e);
+                    alert("生徒データの取得に失敗しました。Firestoreのルールが正しく更新されているか確認してください。");
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            renderStudentsList: () => {
+                const list = $('students-list');
+                list.innerHTML = '';
+                const query = $('search-student-name').value.toLowerCase().trim();
+
+                let targets = state.students;
+                if (query) {
+                    targets = targets.filter(s => (s.name || '').toLowerCase().includes(query));
+                }
+
+                if (targets.length === 0) {
+                    list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-[0.1em] border-2 border-black bg-white uppercase text-sm">No Students Found</div>`;
+                    return;
+                }
+
+                targets.forEach(student => {
+                    const stats = student.stats || {};
+                    const accuracy = stats.totalAnswered > 0 ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'brutal-box bg-white mb-4';
+                    
+                    const headerBtn = document.createElement('button');
+                    headerBtn.className = 'w-full p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-4 focus:outline-none';
+                    headerBtn.onclick = () => adminApp.toggleStudentLogs(student.id);
+                    
+                    headerBtn.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-black text-white flex items-center justify-center font-black text-xl border-2 border-black shrink-0 shadow-[2px_2px_0px_#ccc]">
+                                ${(student.name || '?').charAt(0).toUpperCase()}
                             </div>
-                            <div class="flex gap-4 text-center mt-2 sm:mt-0 border-t-2 border-black sm:border-0 pt-3 sm:pt-0 w-full sm:w-auto justify-around sm:justify-start">
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Accuracy</p>
-                                    <p class="font-black text-xl">${accuracy}%</p>
+                            <div>
+                                <p class="font-black text-lg md:text-xl uppercase">${student.name || 'No Name'}</p>
+                                <p class="text-[10px] text-gray-500 font-mono tracking-widest mt-1">${student.email || 'No Email'}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 text-center mt-2 sm:mt-0 border-t-2 border-black sm:border-0 pt-3 sm:pt-0 w-full sm:w-auto justify-around sm:justify-start">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Accuracy</p>
+                                <p class="font-black text-xl">${accuracy}%</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Answered</p>
+                                <p class="font-black text-xl">${stats.totalAnswered || 0}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Time</p>
+                                <p class="font-black text-xl">${Math.floor((stats.totalTimeSeconds || 0)/60)}m</p>
+                            </div>
+                        </div>
+                    `;
+                    card.appendChild(headerBtn);
+
+                    const logsContainer = document.createElement('div');
+                    logsContainer.id = `logs-container-${student.id}`;
+                    logsContainer.className = 'hidden border-t-2 border-black bg-gray-50 p-4 md:p-6';
+                    card.appendChild(logsContainer);
+
+                    list.appendChild(card);
+                });
+            },
+
+            toggleStudentLogs: async (studentId) => {
+                const container = $(`logs-container-${studentId}`);
+                if (!container.classList.contains('hidden')) {
+                    container.classList.add('hidden');
+                    return;
+                }
+                
+                container.classList.remove('hidden');
+                container.innerHTML = `<div class="text-center text-sm font-bold uppercase tracking-widest animate-pulse py-4">Loading Logs...</div>`;
+
+                try {
+                    const logsRef = collection(db, 'users', studentId, 'logs');
+                    const snap = await getDocs(logsRef); 
+                    
+                    let logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    logs.sort((a, b) => {
+                        const timeA = a.timestamp?.seconds || 0;
+                        const timeB = b.timestamp?.seconds || 0;
+                        return timeB - timeA;
+                    });
+
+                    if (logs.length === 0) {
+                        container.innerHTML = `<div class="text-center text-gray-400 font-bold text-xs py-4 uppercase tracking-widest">No Recent Activity</div>`;
+                        return;
+                    }
+
+                    const displayLogs = logs.slice(0, 50);
+
+                    let html = `<h5 class="font-black text-xs uppercase tracking-[0.1em] mb-4 border-b-2 border-black pb-2 text-gray-500">Recent Logs (Latest 50)</h5>`;
+                    html += `<div class="space-y-3 max-h-80 overflow-y-auto pr-2">`;
+                    
+                    displayLogs.forEach(log => {
+                        let resultBadge = '';
+                        if (log.result === 'correct') resultBadge = '<span class="status-badge bg-black text-white">Correct</span>';
+                        else if (log.result === 'wrong') resultBadge = '<span class="status-badge bg-gray-300 text-gray-700">Wrong</span>';
+                        else resultBadge = '<span class="status-badge bg-white text-gray-500">Give Up</span>';
+
+                        const dateStr = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString('ja-JP', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
+
+                        // ログ内の問題文は、ここで直接DBから isMath を引いてきても良いが、現状ログには isMath が保存されていないのでプレーンテキストで表示
+                        html += `
+                            <div class="border-2 border-black bg-white p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-grow w-full sm:w-auto">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        ${resultBadge}
+                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${log.subject} / ${log.chapter}</span>
+                                    </div>
+                                    <p class="font-black text-sm md:text-base text-gray-900 break-words leading-snug">${log.questionText}</p>
                                 </div>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Answered</p>
-                                    <p class="font-black text-xl">${stats.totalAnswered || 0}</p>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Time</p>
-                                    <p class="font-black text-xl">${Math.floor((stats.totalTimeSeconds || 0)/60)}m</p>
+                                <div class="flex items-center gap-4 text-xs font-black sm:text-right shrink-0 border-t-2 border-dashed border-gray-200 sm:border-0 pt-2 sm:pt-0 w-full sm:w-auto justify-between sm:justify-end">
+                                    <div class="text-gray-800 whitespace-nowrap border-2 border-black px-2 py-1 bg-gray-100">${log.timeSeconds || 0}s</div>
+                                    <div class="text-gray-400 text-[10px] whitespace-nowrap font-mono">${dateStr}</div>
                                 </div>
                             </div>
                         `;
-                        card.appendChild(headerBtn);
-            
-                        const logsContainer = document.createElement('div');
-                        logsContainer.id = `logs-container-${student.id}`;
-                        logsContainer.className = 'hidden border-t-2 border-black bg-gray-50 p-4 md:p-6';
-                        card.appendChild(logsContainer);
-            
-                        list.appendChild(card);
                     });
-                },
-            
-                toggleStudentLogs: async (studentId) => {
-                    const container = $(`logs-container-${studentId}`);
-                    if (!container.classList.contains('hidden')) {
-                        container.classList.add('hidden');
-                        return;
-                    }
-                    
-                    container.classList.remove('hidden');
-                    container.innerHTML = `<div class="text-center text-sm font-bold uppercase tracking-widest animate-pulse py-4">Loading Logs...</div>`;
-            
-                    try {
-                        const logsRef = collection(db, 'users', studentId, 'logs');
-                        const snap = await getDocs(logsRef); 
-                        
-                        let logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                        
-                        logs.sort((a, b) => {
-                            const timeA = a.timestamp?.seconds || 0;
-                            const timeB = b.timestamp?.seconds || 0;
-                            return timeB - timeA;
-                        });
-            
-                        if (logs.length === 0) {
-                            container.innerHTML = `<div class="text-center text-gray-400 font-bold text-xs py-4 uppercase tracking-widest">No Recent Activity</div>`;
-                            return;
-                        }
-            
-                        
-                        const displayLogs = logs.slice(0, 50);
-            
-                        let html = `<h5 class="font-black text-xs uppercase tracking-[0.1em] mb-4 border-b-2 border-black pb-2 text-gray-500">Recent Logs (Latest 50)</h5>`;
-                        html += `<div class="space-y-3 max-h-80 overflow-y-auto pr-2">`;
-                        
-                        displayLogs.forEach(log => {
-                            let resultBadge = '';
-                            if (log.result === 'correct') resultBadge = '<span class="status-badge bg-black text-white">Correct</span>';
-                            else if (log.result === 'wrong') resultBadge = '<span class="status-badge bg-gray-300 text-gray-700">Wrong</span>';
-                            else resultBadge = '<span class="status-badge bg-white text-gray-500">Give Up</span>';
-            
-                            const dateStr = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString('ja-JP', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
-            
-                            html += `
-                                <div class="border-2 border-black bg-white p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                    <div class="flex-grow w-full sm:w-auto">
-                                        <div class="flex items-center gap-2 mb-2">
-                                            ${resultBadge}
-                                            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${log.subject} / ${log.chapter}</span>
-                                        </div>
-                                        <p class="font-black text-sm md:text-base text-gray-900 break-words leading-snug">${log.questionText}</p>
-                                    </div>
-                                    <div class="flex items-center gap-4 text-xs font-black sm:text-right shrink-0 border-t-2 border-dashed border-gray-200 sm:border-0 pt-2 sm:pt-0 w-full sm:w-auto justify-between sm:justify-end">
-                                        <div class="text-gray-800 whitespace-nowrap border-2 border-black px-2 py-1 bg-gray-100">${log.timeSeconds || 0}s</div>
-                                        <div class="text-gray-400 text-[10px] whitespace-nowrap font-mono">${dateStr}</div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-            
-                        html += `</div>`;
-                        container.innerHTML = html;
-            
-                    } catch (e) {
-                        console.error(e);
-                        container.innerHTML = `<div class="text-center text-red-500 font-bold text-xs py-4 uppercase">Failed to load logs. Rules issue?</div>`;
-                    }
-                },
-            
-                
-                createUser: async (e) => {
-                    e.preventDefault();
-                    const email = $('new-user-email').value.trim();
-                    const password = $('new-user-password').value.trim();
-                    nav.setLoading(true);
-                    try {
-                        const res = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                        await setDoc(doc(db, 'admin_users', res.user.uid), { email: email, createdAt: serverTimestamp() });
-                        await signOut(secondaryAuth);
-                        alert(`作問ユーザー (${email}) を正常に作成しました。`);
-                        $('new-user-email').value = '';
-                        $('new-user-password').value = '';
-                        await adminApp.loadAdminUsers();
-                    } catch (e) {
-                        let errorMessage = e.message;
-                        if (e.code === 'auth/email-already-in-use') errorMessage = "このメールアドレスは既に登録されています。";
-                        else if (e.code === 'auth/weak-password') errorMessage = "パスワードは6文字以上で設定してください。";
-                        else if (e.code === 'auth/invalid-email') errorMessage = "メールアドレスの形式が正しくありません。";
-                        alert(`エラー: ${errorMessage}`);
-                    } finally {
-                        nav.setLoading(false);
-                    }
-                },
-            
-                loadAdminUsers: async () => {
-                    try {
-                        const snap = await getDocs(collection(db, 'admin_users'));
-                        const list = $('admin-users-list');
-                        list.innerHTML = '';
-                        snap.docs.forEach(d => {
-                            const data = d.data();
-                            const li = document.createElement('li');
-                            li.className = 'brutal-box p-4 bg-white flex flex-col sm:flex-row justify-between sm:items-center text-sm font-bold gap-2 sm:gap-0';
-                            li.innerHTML = `
-                                <span class="text-base font-black break-all pr-2">${data.email}</span>
-                                <span class="text-[10px] text-gray-500 border border-gray-300 px-2 py-1 bg-gray-50 font-mono tracking-widest whitespace-nowrap">UID: ${d.id.substring(0, 10)}...</span>
-                            `;
-                            list.appendChild(li);
-                        });
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            };
-            
-            window.nav = nav;
-            window.authApp = authApp;
-            window.adminApp = adminApp;
-            
-            window.onload = () => authApp.init();
-            
-        </script>
-    </body>
 
+                    html += `</div>`;
+                    container.innerHTML = html;
+
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = `<div class="text-center text-red-500 font-bold text-xs py-4 uppercase">Failed to load logs. Rules issue?</div>`;
+                }
+            },
+
+            // ===== ID管理 =====
+            createUser: async (e) => {
+                e.preventDefault();
+                const email = $('new-user-email').value.trim();
+                const password = $('new-user-password').value.trim();
+                nav.setLoading(true);
+                try {
+                    const res = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                    await setDoc(doc(db, 'admin_users', res.user.uid), { email: email, createdAt: serverTimestamp() });
+                    await signOut(secondaryAuth);
+                    alert(`作問ユーザー (${email}) を正常に作成しました。`);
+                    $('new-user-email').value = '';
+                    $('new-user-password').value = '';
+                    await adminApp.loadAdminUsers();
+                } catch (e) {
+                    let errorMessage = e.message;
+                    if (e.code === 'auth/email-already-in-use') errorMessage = "このメールアドレスは既に登録されています。";
+                    else if (e.code === 'auth/weak-password') errorMessage = "パスワードは6文字以上で設定してください。";
+                    else if (e.code === 'auth/invalid-email') errorMessage = "メールアドレスの形式が正しくありません。";
+                    alert(`エラー: ${errorMessage}`);
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+
+            loadAdminUsers: async () => {
+                try {
+                    const snap = await getDocs(collection(db, 'admin_users'));
+                    const list = $('admin-users-list');
+                    list.innerHTML = '';
+                    snap.docs.forEach(d => {
+                        const data = d.data();
+                        const li = document.createElement('li');
+                        li.className = 'brutal-box p-4 bg-white flex flex-col sm:flex-row justify-between sm:items-center text-sm font-bold gap-2 sm:gap-0';
+                        li.innerHTML = `
+                            <span class="text-base font-black break-all pr-2">${data.email}</span>
+                            <span class="text-[10px] text-gray-500 border border-gray-300 px-2 py-1 bg-gray-50 font-mono tracking-widest whitespace-nowrap">UID: ${d.id.substring(0, 10)}...</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        window.nav = nav;
+        window.authApp = authApp;
+        window.adminApp = adminApp;
+
+        window.onload = () => authApp.init();
+
+    </script>
+</body>
 </html>
