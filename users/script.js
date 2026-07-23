@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
             from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, increment, writeBatch } 
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, increment, writeBatch, addDoc, serverTimestamp } 
             from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -19,7 +19,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         const state = {
             user: null, questionsDB: [], subjects: [], currentSubject: null, currentChapter: null, userStats: null,
-            quiz: { questions: [], currentIndex: 0, score: 0, mistakes: [], startTime: 0, durationSec: 0, isAnswered: false }
+            quiz: { 
+                questions: [], currentIndex: 0, score: 0, mistakes: [], startTime: 0, durationSec: 0, isAnswered: false,
+                qStartTime: 0 
+            }
         };
 
         const $ = (id) => document.getElementById(id);
@@ -45,21 +48,109 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             ensureUserDoc: async (uid) => {
                 const userDocRef = doc(db, 'users', uid);
                 const snap = await getDoc(userDocRef);
-                if (!snap.exists()) await setDoc(userDocRef, { stats: { totalAnswered: 0, totalCorrect: 0, totalTimeSeconds: 0, sessionCount: 0 } });
+                if (!snap.exists()) {
+                    await setDoc(userDocRef, { 
+                        name: '',
+                        email: state.user?.email || '',
+                        stats: { 
+                            totalAnswered: 0, 
+                            totalCorrect: 0, 
+                            totalTimeSeconds: 0, 
+                            sessionCount: 0,
+                            minQuestionTime: null,
+                            maxQuestionTime: 0,
+                            bestAccuracy: 0,
+                            bestSessionTime: null
+                        } 
+                    });
+                }
             },
             fetchUserData: async (uid) => {
                 const userDocRef = doc(db, 'users', uid);
                 const snap = await getDoc(userDocRef);
-                if (snap.exists()) state.userStats = snap.data().stats;
+                if (snap.exists()) {
+                    const data = snap.data();
+                    state.userStats = data.stats || {};
+                    state.userName = data.name || '';
+                }
             },
-            updateUserStats: async (correct, total, timeSec) => {
+            saveName: async (e) => {
+                e.preventDefault();
+                if (!state.user) return;
+                const name = $('mypage-name-input').value.trim();
+                nav.setLoading(true);
+                try {
+                    await updateDoc(doc(db, 'users', state.user.uid), { name });
+                    state.userName = name;
+                    alert("名前を保存しました。");
+                } catch (err) {
+                    alert("名前の保存に失敗しました。");
+                    console.error(err);
+                } finally {
+                    nav.setLoading(false);
+                }
+            },
+            
+            recordQuestionLog: async (qData, resultType, timeSec) => {
+                if (!state.user) return;
+                try {
+                    const logRef = collection(db, 'users', state.user.uid, 'logs');
+                    await addDoc(logRef, {
+                        questionId: qData.id || '',
+                        subject: qData.subject || '',
+                        chapter: qData.chapter || '',
+                        questionText: qData.q || '',
+                        result: resultType, 
+                        timeSeconds: timeSec,
+                        timestamp: serverTimestamp()
+                    });
+                } catch (err) {
+                    console.error("Log record error:", err);
+                }
+            },
+            
+            updateUserStats: async (correct, total, sessionTimeSec, questionTimes) => {
                 if (!state.user) return;
                 try {
                     const userDocRef = doc(db, 'users', state.user.uid);
-                    await updateDoc(userDocRef, {
-                        "stats.totalAnswered": increment(total), "stats.totalCorrect": increment(correct),
-                        "stats.totalTimeSeconds": increment(timeSec), "stats.sessionCount": increment(1)
+                    const snap = await getDoc(userDocRef);
+                    const currStats = snap.exists() ? (snap.data().stats || {}) : {};
+
+                    const newTotalAnswered = (currStats.totalAnswered || 0) + total;
+                    const newTotalCorrect = (currStats.totalCorrect || 0) + correct;
+                    const newTotalTime = (currStats.totalTimeSeconds || 0) + sessionTimeSec;
+                    const newSessionCount = (currStats.sessionCount || 0) + 1;
+
+                    
+                    let minTime = currStats.minQuestionTime;
+                    let maxTime = currStats.maxQuestionTime || 0;
+
+                    questionTimes.forEach(t => {
+                        if (minTime === null || minTime === undefined || t < minTime) minTime = t;
+                        if (t > maxTime) maxTime = t;
                     });
+
+                    
+                    const currentAcc = total > 0 ? Math.round((correct / total) * 100) : 0;
+                    let bestAcc = currStats.bestAccuracy || 0;
+                    if (currentAcc > bestAcc) bestAcc = currentAcc;
+
+                    let bestTime = currStats.bestSessionTime;
+                    if (bestTime === null || bestTime === undefined || sessionTimeSec < bestTime) {
+                        bestTime = sessionTimeSec;
+                    }
+
+                    await updateDoc(userDocRef, {
+                        "stats.totalAnswered": newTotalAnswered,
+                        "stats.totalCorrect": newTotalCorrect,
+                        "stats.totalTimeSeconds": newTotalTime,
+                        "stats.sessionCount": newSessionCount,
+                        "stats.minQuestionTime": minTime,
+                        "stats.maxQuestionTime": maxTime,
+                        "stats.bestAccuracy": bestAcc,
+                        "stats.bestSessionTime": bestTime
+                    });
+                    
                     await dataApp.fetchUserData(state.user.uid);
                 } catch (e) { console.error("Stats update error", e); }
             },
@@ -187,23 +278,50 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 });
             },
             mypage: () => {
-                const stats = state.userStats || { totalAnswered: 0, totalCorrect: 0, totalTimeSeconds: 0, sessionCount: 0 };
-                const accuracy = stats.totalAnswered > 0 ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0;
-                const hours = Math.floor(stats.totalTimeSeconds / 3600);
-                const minutes = Math.floor((stats.totalTimeSeconds % 3600) / 60);
+                const stats = state.userStats || {};
+                const totalAnswered = stats.totalAnswered || 0;
+                const totalCorrect = stats.totalCorrect || 0;
+                const totalTimeSeconds = stats.totalTimeSeconds || 0;
 
+                const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+                const hours = Math.floor(totalTimeSeconds / 3600);
+                const minutes = Math.floor((totalTimeSeconds % 3600) / 60);
+
+                
                 $('mypage-email').innerText = state.user?.email || '---';
-                $('mypage-avatar').innerText = state.user?.email ? state.user.email.charAt(0).toUpperCase() : '?';
+                $('mypage-name-input').value = state.userName || '';
+                $('mypage-avatar').innerText = (state.userName || state.user?.email || '?').charAt(0).toUpperCase();
+                
                 
                 $('mypage-accuracy').innerText = accuracy;
-                $('mypage-correct').innerText = stats.totalCorrect;
-                $('mypage-answered').innerText = stats.totalAnswered;
+                $('mypage-correct').innerText = totalCorrect;
+                $('mypage-answered').innerText = totalAnswered;
                 
                 $('mypage-minutes').innerText = minutes;
                 $('mypage-hours-area').classList.toggle('hidden', hours === 0);
                 if (hours > 0) $('mypage-hours').innerText = hours;
                 
-                $('mypage-sessions').innerText = stats.sessionCount;
+                $('mypage-sessions').innerText = stats.sessionCount || 0;
+
+                
+                const avgSpeed = totalAnswered > 0 ? (totalTimeSeconds / totalAnswered).toFixed(1) : 0;
+                const minSpeed = stats.minQuestionTime !== null && stats.minQuestionTime !== undefined ? stats.minQuestionTime.toFixed(1) : 0;
+                const maxSpeed = stats.maxQuestionTime ? stats.maxQuestionTime.toFixed(1) : 0;
+
+                $('mypage-speed-avg').innerText = avgSpeed;
+                $('mypage-speed-min').innerText = minSpeed;
+                $('mypage-speed-max').innerText = maxSpeed;
+
+                
+                $('mypage-best-acc').innerText = stats.bestAccuracy || 0;
+                
+                if (stats.bestSessionTime !== null && stats.bestSessionTime !== undefined) {
+                    const bMin = Math.floor(stats.bestSessionTime / 60);
+                    const bSec = stats.bestSessionTime % 60;
+                    $('mypage-best-time').innerText = `${bMin}m ${bSec}s`;
+                } else {
+                    $('mypage-best-time').innerText = `0m 0s`;
+                }
             }
         };
 
@@ -218,7 +336,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
                 targetQs = targetQs.sort(() => Math.random() - 0.5);
 
-                state.quiz = { questions: targetQs, currentIndex: 0, score: 0, mistakes: [], startTime: Date.now(), durationSec: 0, isAnswered: false };
+                state.quiz = { 
+                    questions: targetQs, 
+                    currentIndex: 0, 
+                    score: 0, 
+                    mistakes: [], 
+                    startTime: Date.now(), 
+                    durationSec: 0, 
+                    isAnswered: false,
+                    questionTimes: [], 
+                    qStartTime: Date.now()
+                };
 
                 $('quiz-subject-name').innerText = subject;
                 $('quiz-chapter-name').innerText = chapter || 'ALL';
@@ -231,6 +359,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             renderQuestion: () => {
                 const q = state.quiz;
                 q.isAnswered = false;
+                q.qStartTime = Date.now(); 
                 
                 $('quiz-current-num').innerText = q.currentIndex + 1;
                 $('quiz-score').innerText = q.score;
@@ -262,8 +391,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 const currentQ = state.quiz.questions[state.quiz.currentIndex];
                 const isCorrect = quizApp.checkStr(input, currentQ.a);
 
+                
+                const qTimeSec = Math.max(1, Math.round((Date.now() - state.quiz.qStartTime) / 1000));
+                state.quiz.questionTimes.push(qTimeSec);
+
                 if (isCorrect) state.quiz.score++;
                 else state.quiz.mistakes.push(currentQ);
+
+                
+                dataApp.recordQuestionLog(currentQ, isCorrect ? 'correct' : 'wrong', qTimeSec);
 
                 quizApp.showFeedback(isCorrect ? 'correct' : 'wrong', currentQ.a);
             },
@@ -279,7 +415,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (state.quiz.isAnswered) return;
                 state.quiz.isAnswered = true;
                 const currentQ = state.quiz.questions[state.quiz.currentIndex];
+                
+                const qTimeSec = Math.max(1, Math.round((Date.now() - state.quiz.qStartTime) / 1000));
+                state.quiz.questionTimes.push(qTimeSec);
+
                 state.quiz.mistakes.push(currentQ);
+
+                
+                dataApp.recordQuestionLog(currentQ, 'giveup', qTimeSec);
+
                 quizApp.showFeedback('giveup', currentQ.a);
             },
 
@@ -315,7 +459,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 const q = state.quiz;
                 q.durationSec = Math.floor((Date.now() - q.startTime) / 1000);
                 
-                dataApp.updateUserStats(q.score, q.questions.length, q.durationSec);
+                
+                dataApp.updateUserStats(q.score, q.questions.length, q.durationSec, q.questionTimes);
                 
                 $('result-score').innerText = q.score;
                 $('result-total').innerText = q.questions.length;
@@ -348,5 +493,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         window.nav = nav;
         window.authApp = authApp;
         window.quizApp = quizApp;
+        window.dataApp = dataApp;
 
         window.onload = () => authApp.init();
