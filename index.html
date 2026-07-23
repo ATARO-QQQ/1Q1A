@@ -12,14 +12,14 @@
     <body class="flex flex-col items-center">
 
 
-        <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
+        <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
             <div class="animate-spin h-10 w-10 border-4 border-black border-t-transparent"></div>
             <p class="uppercase font-black tracking-[0.2em]">Loading</p>
         </div>
 
 
-        <header id="header" class="hidden w-full max-w-4xl px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black bg-white/95 backdrop-blur-sm sticky top-0 z-40">
-            <h1 class="text-4xl font-black tracking-tight uppercase">1Q1A.</h1>
+        <header id="header" class="hidden w-full max-w-4xl px-4 md:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 border-b-4 border-black bg-white sticky top-0 z-40">
+            <h1 class="text-3xl md:text-4xl font-black tracking-tight uppercase">1Q1A.</h1>
             <nav class="flex gap-4 md:gap-6 text-sm font-bold uppercase tracking-widest">
                 <button onclick="nav.go('home')" class="hover:bg-black hover:text-white px-3 py-1 transition-colors border-2 border-transparent hover:border-black">HOME</button>
                 <button onclick="nav.go('mypage')" class="hover:bg-black hover:text-white px-3 py-1 transition-colors border-2 border-transparent hover:border-black">MY PAGE</button>
@@ -95,22 +95,24 @@
 
 
             <div id="screen-quiz" class="screen w-full">
-                <div class="brutal-box p-5 md:p-8 flex flex-col min-h-[450px] md:min-h-[550px]">
+                <div class="brutal-box p-5 md:p-8 flex flex-col min-h-[450px] md:min-h-[500px]">
 
 
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b-3 border-black pb-4 mb-8 gap-4 sm:gap-0">
-                        <div class="font-bold text-xs md:text-sm uppercase tracking-widest text-gray-500 break-words w-full sm:w-auto pr-4">
-                            <span id="quiz-subject-name"></span> <br class="sm:hidden" /><span class="hidden sm:inline mx-2">/</span> <span id="quiz-chapter-name" class="text-black font-black marker-line mt-1 sm:mt-0"></span>
+                    <div class="flex flex-wrap justify-between items-center border-b-3 border-black pb-4 mb-8 gap-3">
+                        <div class="font-bold text-sm md:text-base tracking-wider text-gray-700 flex flex-wrap items-center gap-2">
+                            <span id="quiz-subject-name" class="font-black text-black"></span>
+                            <span class="text-gray-400">/</span>
+                            <span id="quiz-chapter-name" class="chapter-badge text-xs md:text-sm"></span>
                         </div>
-                        <div class="flex flex-wrap gap-4 text-sm md:text-base font-black whitespace-nowrap bg-gray-100 p-2 border-2 border-black">
-                            <div>Q.<span id="quiz-current-num" class="text-lg ml-1">1</span><span class="text-xs text-gray-500 ml-1">/ <span id="quiz-total-num">10</span></span></div>
-                            <div class="text-gray-400">O:<span id="quiz-score" class="text-black ml-1">0</span></div>
-                            <div class="text-gray-400">X:<span id="quiz-mistakes" class="text-black ml-1">0</span></div>
+                        <div class="flex items-center gap-3 text-sm md:text-base font-black bg-gray-100 p-2 border-2 border-black ml-auto">
+                            <div>Q.<span id="quiz-current-num" class="text-lg ml-0.5">1</span><span class="text-xs text-gray-500 ml-0.5">/<span id="quiz-total-num">10</span></span></div>
+                            <div class="text-gray-400">O:<span id="quiz-score" class="text-black ml-0.5">0</span></div>
+                            <div class="text-gray-400">X:<span id="quiz-mistakes" class="text-black ml-0.5">0</span></div>
                         </div>
                     </div>
 
 
-                    <div id="quiz-question-text" class="text-xl md:text-3xl font-black leading-snug mb-8 flex-grow tracking-wide break-words">
+                    <div id="quiz-question-text" class="text-xl md:text-3xl font-black leading-relaxed mb-8 flex-grow tracking-wide break-words">
                         問題文
                     </div>
 
@@ -119,20 +121,20 @@
 
 
                         <div id="quiz-input-area">
-                            <form onsubmit="quizApp.submitAnswer(event)" class="flex flex-col sm:flex-row gap-3 md:gap-4 items-end">
-                                <div class="w-full">
-                                    <label class="block font-black uppercase text-xs mb-2 tracking-[0.1em] text-gray-400">Answer</label>
-                                    <input type="text" id="quiz-answer-input" class="brutal-input" autocomplete="off">
+                            <form onsubmit="quizApp.submitAnswer(event)" class="flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-end">
+                                <div class="flex-1">
+                                    <label class="block font-black uppercase text-xs mb-1.5 tracking-widest text-gray-500">Answer</label>
+                                    <input type="text" id="quiz-answer-input" class="brutal-input h-12" autocomplete="off" placeholder="解答を入力...">
                                 </div>
-                                <button type="submit" id="quiz-submit-btn" class="brutal-btn black px-10 py-3 w-full sm:w-auto text-base whitespace-nowrap mt-4 sm:mt-0">
+                                <button type="submit" id="quiz-submit-btn" class="brutal-btn black h-12 px-8 text-base font-black whitespace-nowrap mt-2 sm:mt-0">
                                     判定
                                 </button>
                             </form>
-                            <div class="mt-6 flex flex-wrap justify-end gap-4 md:gap-6 pt-4 border-t-2 border-dashed border-gray-300">
-                                <button type="button" onclick="quizApp.skip()" class="text-xs font-black text-gray-400 hover:text-black uppercase tracking-[0.1em] transition-colors border-b-2 border-transparent hover:border-black pb-0.5">
+                            <div class="mt-6 flex justify-end gap-6 pt-4 border-t-2 border-dashed border-gray-300">
+                                <button type="button" onclick="quizApp.skip()" class="text-xs font-black text-gray-500 hover:text-black uppercase tracking-widest transition-colors border-b-2 border-transparent hover:border-black pb-0.5">
                                     SKIP
                                 </button>
-                                <button type="button" onclick="quizApp.giveUp()" class="text-xs font-black text-gray-400 hover:text-black uppercase tracking-[0.1em] transition-colors border-b-2 border-transparent hover:border-black pb-0.5">
+                                <button type="button" onclick="quizApp.giveUp()" class="text-xs font-black text-gray-500 hover:text-black uppercase tracking-widest transition-colors border-b-2 border-transparent hover:border-black pb-0.5">
                                     GIVE UP
                                 </button>
                             </div>
@@ -223,7 +225,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button onclick="authApp.logout()" class="brutal-btn w-full py-5 text-base tracking-[0.2em] uppercase text-red-600 border-red-600 hover:bg-red-600 hover:text-white hover:border-black shadow-[6px_6px_0px_#000]">
+                    <button onclick="authApp.logout()" class="brutal-btn danger w-full py-5 text-base tracking-[0.2em] uppercase">
                         LOGOUT
                     </button>
                 </div>
