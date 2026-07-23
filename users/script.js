@@ -43,9 +43,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         const dataApp = {
             ensureUserDoc: async (uid) => {
-                const docRef = doc(db, 'users', uid);
-                const snap = await getDoc(docRef);
-                if (!snap.exists()) await setDoc(docRef, { stats: { totalAnswered: 0, totalCorrect: 0, totalTimeSeconds: 0, sessionCount: 0 } });
+                const userDocRef = doc(db, 'users', uid);
+                const snap = await getDoc(userDocRef);
+                if (!snap.exists()) await setDoc(userDocRef, { stats: { totalAnswered: 0, totalCorrect: 0, totalTimeSeconds: 0, sessionCount: 0 } });
             },
             fetchUserData: async (uid) => {
                 const userDocRef = doc(db, 'users', uid);
@@ -55,7 +55,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             updateUserStats: async (correct, total, timeSec) => {
                 if (!state.user) return;
                 try {
-                    await updateDoc(doc(db, 'users', state.user.uid), {
+                    const userDocRef = doc(db, 'users', state.user.uid);
+                    await updateDoc(userDocRef, {
                         "stats.totalAnswered": increment(total), "stats.totalCorrect": increment(correct),
                         "stats.totalTimeSeconds": increment(timeSec), "stats.sessionCount": increment(1)
                     });
@@ -115,8 +116,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             toggleMode: () => {
                 authApp.isLoginMode = !authApp.isLoginMode;
                 $('auth-title').innerText = authApp.isLoginMode ? 'LOGIN' : 'SIGN UP';
-                $('auth-submit-text').innerText = authApp.isLoginMode ? 'サインイン' : 'アカウント作成';
-                $('auth-toggle-text').innerText = authApp.isLoginMode ? '新規登録はこちら' : '既にアカウントをお持ちの方はこちら';
+                $('auth-submit-text').innerText = authApp.isLoginMode ? 'SIGN IN' : 'CREATE ACCOUNT';
+                $('auth-toggle-text').innerText = authApp.isLoginMode ? 'Create Account' : 'Back to Login';
                 $('auth-error').classList.add('hidden');
             },
             handleSubmit: async (e) => {
