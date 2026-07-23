@@ -154,13 +154,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 state.subjects.forEach(subj => {
                     const count = state.questionsDB.filter(q => q.subject === subj.name).length;
                     const btn = document.createElement('button');
-                    btn.className = 'brutal-btn p-5 md:p-6 text-left flex flex-col justify-between group h-full items-start break-words';
+                    btn.className = 'brutal-btn p-4 md:p-5 text-left flex flex-col justify-between group h-full items-start break-words';
                     btn.onclick = () => { state.currentSubject = subj.name; nav.go('subject'); };
                     btn.innerHTML = `
-                        <span class="text-xl md:text-2xl font-black mb-6 w-full leading-tight uppercase">${subj.name}</span>
+                        <span class="text-lg md:text-xl font-black mb-4 w-full leading-tight uppercase">${subj.name}</span>
                         <div class="flex justify-between items-center w-full mt-auto">
-                            <span class="font-bold border-2 border-black bg-white text-black text-xs px-2 py-1 uppercase">${count} Q</span>
-                            <span class="font-black text-xl transition-transform group-hover:translate-x-2">&rarr;</span>
+                            <span class="font-bold border-2 border-black bg-white text-black text-[10px] md:text-xs px-1.5 py-0.5 uppercase">${count} Q</span>
+                            <span class="font-black text-lg transition-transform group-hover:translate-x-1.5">&rarr;</span>
                         </div>
                     `;
                     list.appendChild(btn);
@@ -177,11 +177,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 subjData.chapters.forEach(ch => {
                     const count = state.questionsDB.filter(q => q.subject === state.currentSubject && q.chapter === ch).length;
                     const btn = document.createElement('button');
-                    btn.className = 'brutal-btn p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white gap-3 sm:gap-0';
+                    btn.className = 'brutal-btn p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white gap-2 sm:gap-0';
                     btn.onclick = () => quizApp.start(state.currentSubject, ch);
                     btn.innerHTML = `
-                        <span class="font-black text-sm md:text-base text-left break-words uppercase leading-snug">${ch}</span>
-                        <span class="font-bold border-2 border-black px-2 py-1 text-xs whitespace-nowrap uppercase">${count} Q</span>
+                        <span class="font-black text-sm text-left break-words uppercase leading-snug">${ch}</span>
+                        <span class="font-bold border-2 border-black px-1.5 py-0.5 text-[10px] md:text-xs whitespace-nowrap uppercase">${count} Q</span>
                     `;
                     list.appendChild(btn);
                 });
@@ -288,11 +288,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 
                 const header = $('quiz-feedback-header');
                 if (type === 'correct') {
-                    header.innerHTML = `<span class="text-3xl font-black text-white">O</span><h3 class="text-2xl font-black uppercase tracking-[0.1em] text-white">Correct</h3>`;
+                    header.innerHTML = `<span class="text-2xl md:text-3xl font-black text-white">O</span><h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-white">Correct</h3>`;
                 } else if (type === 'wrong') {
-                    header.innerHTML = `<span class="text-3xl font-black text-gray-400">X</span><h3 class="text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Wrong</h3>`;
+                    header.innerHTML = `<span class="text-2xl md:text-3xl font-black text-gray-400">X</span><h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Wrong</h3>`;
                 } else {
-                    header.innerHTML = `<span class="text-3xl font-black text-gray-400">-</span><h3 class="text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Give Up</h3>`;
+                    header.innerHTML = `<span class="text-2xl md:text-3xl font-black text-gray-400">-</span><h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Give Up</h3>`;
                 }
 
                 $('quiz-feedback-answer').innerText = answers.join(' / ');
@@ -330,10 +330,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     misArea.classList.remove('hidden');
                     q.mistakes.forEach(mis => {
                         const li = document.createElement('li');
-                        li.className = 'border-3 border-black p-4 bg-gray-50';
+                        li.className = 'border-2 border-black p-3 md:p-4 bg-gray-50';
                         li.innerHTML = `
-                            <p class="font-black text-base md:text-lg mb-3 break-words">${mis.q}</p>
-                            <p class="font-bold text-black text-sm md:text-base bg-white border-2 border-black inline-block px-2 py-1"><span class="bg-black text-white px-2 py-0.5 mr-2 text-xs uppercase">Answer</span> ${mis.a[0]}</p>
+                            <p class="font-black text-sm md:text-base mb-2.5 break-words">${mis.q}</p>
+                            <p class="font-bold text-black text-xs md:text-sm bg-white border-2 border-black inline-block px-1.5 py-0.5"><span class="bg-black text-white px-1.5 py-0.5 mr-1.5 text-[10px] md:text-xs uppercase">Answer</span> ${mis.a[0]}</p>
                         `;
                         misList.appendChild(li);
                     });
