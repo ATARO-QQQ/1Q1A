@@ -48,7 +48,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (!snap.exists()) await setDoc(docRef, { stats: { totalAnswered: 0, totalCorrect: 0, totalTimeSeconds: 0, sessionCount: 0 } });
             },
             fetchUserData: async (uid) => {
-                const snap = await getDoc(docRef = doc(db, 'users', uid));
+                const userDocRef = doc(db, 'users', uid);
+                const snap = await getDoc(userDocRef);
                 if (snap.exists()) state.userStats = snap.data().stats;
             },
             updateUserStats: async (correct, total, timeSec) => {
