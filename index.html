@@ -1,479 +1,236 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一問一答</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'BIZ UDPGothic', sans-serif;
-            background-color: #fafafa;
-            color: #111;
-            min-height: 100vh;
-        }
 
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>一問一答 - 1Q1A</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://ataro-qqq.github.io/1Q1A/users/style.css">
+    </head>
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    <body class="flex flex-col items-center">
 
-        .input-line {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #000;
-            border-radius: 0;
-            padding: 8px 4px;
-            font-size: 1.25rem;
-            width: 100%;
-            outline: none;
-            transition: border-width 0.2s;
-        }
-        .input-line:focus {
-            border-bottom-width: 2px;
-        }
 
-        .btn-simple {
-            border: 1px solid #000;
-            background-color: #fff;
-            color: #000;
-            transition: all 0.2s;
-        }
-        .btn-simple:hover:not(:disabled) {
-            background-color: #000;
-            color: #fff;
-        }
-        .btn-simple:disabled {
-            border-color: #ccc;
-            color: #ccc;
-            cursor: not-allowed;
-        }
-    </style>
-
-    <!-- ここに各教科のデータをぶち込むのだ！ -->
-    <script src="https://ataro-qqq.github.io/1Q1A/text/chiri_tanq/c1_1.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/chiri_tanq/c1_2.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/chiri_tanq/c1_3.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/chiri_tanq/c1_4.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_1.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_2.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_3.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_4.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_5.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_6.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_7.js"></script>
-    <script src="https://ataro-qqq.github.io/1Q1A/text/kokyo/c1_8.js"></script>
-    
-</head>
-<body class="p-4 md:p-8 flex justify-center items-start">
-
-    <div class="w-full max-w-2xl mt-4 bg-white border border-gray-300 p-8 md:p-12 shadow-sm">
-        
-        <div class="border-b border-black mb-8 pb-4 flex justify-between items-end">
-            <h1 class="text-2xl font-bold tracking-widest">一問一答</h1>
+        <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
+            <div class="animate-spin h-10 w-10 border-2 border-black border-t-transparent"></div>
+            <p>LOADING...</p>
         </div>
 
-        <div id="screen-home" class="screen active">
-            <h2 class="text-lg mb-6 font-bold border-l-4 border-black pl-3">教科選択</h2>
-            
-            <div id="subject-list" class="space-y-4">
-            </div>
 
-            <div id="no-data-msg" class="hidden mt-8 p-6 border border-gray-200 text-center text-sm">
-                <p>クイズデータが見つかりません。</p>
-                <p class="mt-2 text-gray-500">外部JSファイルを読み込んでください。</p>
-            </div>
-        </div>
+        <header id="header" class="hidden w-full max-w-4xl px-4 md:px-8 py-4 md:py-6 flex justify-between items-end">
+            <h1 class="text-3xl font-black tracking-tighter" style="text-shadow: 2px 2px 0px #d1d5db;">1Q1A.</h1>
+            <nav class="flex gap-4 md:gap-6 text-sm md:text-base">
+                <button onclick="nav.go('home')" class="font-bold hover:underline underline-offset-4 decoration-2">HOME</button>
+                <button onclick="nav.go('mypage')" class="font-bold hover:underline underline-offset-4 decoration-2">MY PAGE</button>
+            </nav>
+        </header>
 
-        <div id="screen-subject" class="screen">
-            <button onclick="navigate('home')" class="mb-6 text-sm text-gray-500 hover:text-black">&lt; ホームへ戻る</button>
-            
-            <h2 id="subject-title" class="text-2xl font-bold mb-8">教科名</h2>
-            
-            <div class="mb-10">
-                <h3 class="font-bold mb-4 border-l-4 border-black pl-3">単元選択</h3>
-                <div id="chapter-list" class="space-y-3">
-                </div>
-            </div>
+        <main class="w-full max-w-4xl p-4 md:p-8 flex-grow flex flex-col items-center">
 
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <button onclick="startRemix()" class="btn-simple px-6 py-3 font-bold w-full md:w-auto">
-                    全問ランダムに出題
-                </button>
-            </div>
-        </div>
 
-        <div id="screen-quiz" class="screen">
-            
-            <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 pb-2 border-b border-gray-200 text-sm">
-                <div class="font-bold mb-2 md:mb-0" id="quiz-chapter-name">単元名</div>
-                <div class="flex gap-4">
-                    <span>進行: <span class="font-bold text-lg"><span id="q-current">1</span>/<span id="q-total">10</span></span></span>
-                    <span>正解: <span id="realtime-correct" class="font-bold">0</span></span>
-                    <span>誤答: <span id="realtime-wrong" class="font-bold">0</span></span>
-                </div>
-            </div>
+            <div id="screen-auth" class="screen w-full max-w-md mt-10 md:mt-20">
+                <div class="brutal-box p-6 md:p-10">
+                    <h2 id="auth-title" class="text-2xl font-black mb-8 text-center uppercase tracking-widest">LOGIN</h2>
 
-            <div class="mb-10 text-lg leading-relaxed min-h-[80px]">
-                <p id="question-text" class="font-bold">問題文がここに入ります。</p>
-            </div>
+                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6"></div>
 
-            <div id="input-area" class="mb-8">
-                <form id="answer-form" onsubmit="submitAnswer(event)" class="flex flex-col md:flex-row gap-4 items-end">
-                    <div class="w-full">
-                        <label for="answer-input" class="block text-xs font-bold mb-1 text-gray-500">解答：</label>
-                        <input type="text" id="answer-input" class="input-line" autocomplete="off" placeholder="...">
+                    <form id="auth-form" onsubmit="authApp.handleSubmit(event)" class="space-y-5">
+                        <div>
+                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Email</label>
+                            <input type="email" id="auth-email" required class="brutal-input" placeholder="mail@example.com">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Password</label>
+                            <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••" minlength="6">
+                        </div>
+                        <button type="submit" class="brutal-btn black w-full py-3 text-lg tracking-widest mt-6">
+                            <span id="auth-submit-text">サインイン</span>
+                        </button>
+                    </form>
+
+                    <div class="mt-8 text-center">
+                        <button onclick="authApp.toggleMode()" class="text-sm font-bold border-b border-black pb-0.5 hover:border-transparent transition-colors text-gray-600 hover:text-black">
+                            <span id="auth-toggle-text">新規登録はこちら</span> &rarr;
+                        </button>
                     </div>
-                    <button type="submit" id="submit-btn" class="btn-simple px-6 py-2 font-bold whitespace-nowrap mt-4 md:mt-0">
-                        判定
-                    </button>
-                </form>
-                
-                <div class="mt-4 flex justify-end gap-6">
-                    <button type="button" onclick="skipQuestion()" class="text-sm text-gray-400 hover:text-black transition-colors">
-                        スキップ
-                    </button>
-                    <button type="button" onclick="giveUpQuestion()" class="text-sm text-gray-400 hover:text-black transition-colors">
-                        ギブアップ
-                    </button>
                 </div>
             </div>
 
-            <div id="feedback-area" class="hidden text-center bg-gray-50 border border-gray-200 p-6">
-                <h3 id="feedback-title" class="text-xl font-bold mb-2">判定</h3>
-                <p class="mb-6 text-gray-700">正解：<span id="feedback-answers" class="font-bold text-black border-b border-gray-400 pb-1"></span></p>
-                
-                <button onclick="nextQuestion()" class="btn-simple px-8 py-2 font-bold text-sm">
-                    次へ &gt;
-                </button>
-            </div>
-        </div>
 
-        <div id="screen-result" class="screen">
-            <h2 class="text-2xl font-bold mb-8 text-center">結果</h2>
-            
-            <div class="text-center mb-10 flex justify-center gap-8">
-                <div>
-                    <p class="text-gray-500 text-sm mb-1">正解</p>
-                    <p class="text-4xl font-bold" id="result-score">0</p>
+            <div id="screen-home" class="screen w-full">
+                <h2 class="text-2xl font-black mb-6 md:mb-8 border-l-4 border-black pl-3 uppercase tracking-widest">Select Subject</h2>
+
+                <div id="subject-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+
                 </div>
-                <div>
-                    <p class="text-gray-500 text-sm mb-1">問題数</p>
-                    <p class="text-4xl font-bold text-gray-400" id="result-total">0</p>
+
+                <div id="no-data-msg" class="hidden brutal-box p-6 text-center font-bold mt-8">
+                    <p class="text-lg mb-2">NO DATA</p>
+                    <p class="text-xs text-gray-500">作問ページからデータを追加してください。</p>
                 </div>
             </div>
 
-            <div id="mistakes-area" class="mb-10 hidden">
-                <h3 class="font-bold text-sm mb-4 border-b border-gray-200 pb-2">間違えた問題</h3>
-                <ul id="mistakes-list" class="space-y-4 text-sm">
-                </ul>
-            </div>
 
-            <div class="text-center space-y-4 flex flex-col items-center border-t border-gray-200 pt-8">
-                <button onclick="retryCurrent()" class="btn-simple px-8 py-3 font-bold w-full max-w-xs">
-                    もう一度挑戦する
+            <div id="screen-subject" class="screen w-full">
+                <button onclick="nav.go('home')" class="font-bold mb-6 hover:underline decoration-2 text-sm text-gray-500 hover:text-black transition-colors">
+                    &larr; BACK
                 </button>
-                <button onclick="navigate('subject')" class="text-sm text-gray-500 hover:text-black mt-2">
-                    単元選択へ戻る
-                </button>
-            </div>
-        </div>
 
-    </div>
+                <h2 id="subject-title" class="text-3xl md:text-4xl font-black mb-10 tracking-tight uppercase border-b-2 border-black pb-4">Subject Name</h2>
 
-    <script>
-        const appState = {
-            subjects: [],
-            currentSubject: null,
-            currentChapter: null,
-            questions: [],
-            remainingQuestions: [], 
-            currentQuestion: null, 
-            score: 0,
-            wrongScore: 0,
-            mistakes: [],
-            isAnswered: false 
-        };
+                <div class="mb-10">
+                    <h3 class="text-xl font-black mb-4 uppercase tracking-widest text-gray-400">Chapters</h3>
+                    <div id="chapter-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.quizSubjects && window.quizSubjects.length > 0) {
-                
-                const grouped = {};
-                window.quizSubjects.forEach(subject => {
-                    const name = subject.subjectName;
-                    if (!grouped[name]) {
-                        grouped[name] = {
-                            subjectName: name,
-                            chapters: [],
-                            questions: []
-                        };
-                    }
-                    
-                    subject.chapters.forEach(ch => {
-                        if (!grouped[name].chapters.some(existing => existing.id === ch.id)) {
-                            grouped[name].chapters.push(ch);
-                        }
-                    });
-                    
-                    grouped[name].questions.push(...subject.questions);
-                });
-
-                appState.subjects = Object.values(grouped);
-                renderHome();
-
-            } else {
-                document.getElementById('no-data-msg').classList.remove('hidden');
-            }
-        });
-
-        function navigate(targetScreen) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(`screen-${targetScreen}`).classList.add('active');
-
-            if (targetScreen === 'home') renderHome();
-            if (targetScreen === 'subject') renderSubject();
-        }
-
-        function renderHome() {
-            const listEl = document.getElementById('subject-list');
-            listEl.innerHTML = '';
-            
-            appState.subjects.forEach(subject => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left border border-gray-300 p-5 hover:bg-gray-50 transition-colors flex justify-between items-center';
-                btn.onclick = () => {
-                    appState.currentSubject = subject;
-                    navigate('subject');
-                };
-                
-                btn.innerHTML = `
-                    <div>
-                        <span class="text-xl font-bold block">${subject.subjectName}</span>
-                        <span class="text-xs text-gray-500 mt-1 block">全 ${subject.questions.length} 問</span>
                     </div>
-                    <span class="text-gray-400">&gt;</span>
-                `;
-                listEl.appendChild(btn);
-            });
-        }
+                </div>
 
-        function renderSubject() {
-            const subject = appState.currentSubject;
-            document.getElementById('subject-title').innerText = subject.subjectName;
-            
-            const listEl = document.getElementById('chapter-list');
-            listEl.innerHTML = '';
+                <div class="pt-6">
+                    <button onclick="quizApp.start(state.currentSubject, null)" class="brutal-btn black w-full py-4 text-base tracking-widest uppercase">
+                        Shuffle All Chapters
+                    </button>
+                </div>
+            </div>
 
-            const sortedChapters = [...subject.chapters].sort((a, b) => a.id - b.id);
 
-            sortedChapters.forEach(chapter => {
-                const qCount = subject.questions.filter(q => String(q.ch) === String(chapter.id)).length;
+            <div id="screen-quiz" class="screen w-full">
+                <div class="brutal-box p-5 md:p-8 flex flex-col min-h-[400px] md:min-h-[500px]">
 
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left border border-gray-300 p-4 hover:border-black transition-colors flex justify-between items-center';
-                btn.onclick = () => startChapter(chapter);
-                btn.innerHTML = `
-                    <span class="font-bold text-sm md:text-base">${chapter.name}</span>
-                    <span class="text-xs text-gray-500">${qCount}問</span>
-                `;
-                listEl.appendChild(btn);
-            });
-        }
 
-        function startChapter(chapter) {
-            appState.currentChapter = chapter;
-            const qs = appState.currentSubject.questions.filter(q => String(q.ch) === String(chapter.id));
-            if (qs.length === 0) {
-                alert('この単元には問題がありません。');
-                return;
-            }
-            appState.questions = shuffleArray([...qs]);
-            startQuizProcess();
-        }
+                    <div class="flex flex-col md:flex-row justify-between md:items-end border-b-2 border-black pb-3 mb-6 gap-2 md:gap-0">
+                        <div class="font-bold text-sm md:text-base uppercase tracking-widest text-gray-600">
+                            <span id="quiz-subject-name"></span> <span class="mx-1">/</span> <span id="quiz-chapter-name" class="text-black marker-line"></span>
+                        </div>
+                        <div class="flex gap-4 text-base font-black">
+                            <div>Q.<span id="quiz-current-num" class="text-xl ml-1">1</span><span class="text-xs text-gray-400 ml-1">/ <span id="quiz-total-num">10</span></span></div>
+                            <div class="text-gray-400">O: <span id="quiz-score" class="text-black">0</span></div>
+                            <div class="text-gray-400">X: <span id="quiz-mistakes" class="text-black">0</span></div>
+                        </div>
+                    </div>
 
-        function startRemix() {
-            appState.currentChapter = null;
-            const qs = appState.currentSubject.questions;
-            if (qs.length === 0) return;
-            appState.questions = shuffleArray([...qs]);
-            startQuizProcess();
-        }
 
-        function startQuizProcess() {
-            appState.remainingQuestions = [...appState.questions]; 
-            appState.score = 0;
-            appState.wrongScore = 0;
-            appState.mistakes = [];
-            
-            const chapterName = appState.currentChapter ? appState.currentChapter.name : '全問ランダム';
-            document.getElementById('quiz-chapter-name').innerText = chapterName;
-            document.getElementById('q-total').innerText = appState.questions.length;
-            
-            updateScoreDisplay();
-            
-            navigate('quiz');
-            renderQuestion();
-        }
+                    <div id="quiz-question-text" class="text-xl md:text-2xl font-black leading-relaxed mb-8 flex-grow tracking-wide">
+                        問題文
+                    </div>
 
-        function updateScoreDisplay() {
-            document.getElementById('realtime-correct').innerText = appState.score;
-            document.getElementById('realtime-wrong').innerText = appState.wrongScore;
-        }
 
-        function renderQuestion() {
-            appState.isAnswered = false;
-            appState.currentQuestion = appState.remainingQuestions[0]; 
-            const q = appState.currentQuestion;
-            
-            const currentNum = appState.questions.length - appState.remainingQuestions.length + 1;
-            document.getElementById('q-current').innerText = currentNum;
-            document.getElementById('question-text').innerText = q.q;
-            
-            const inputEl = document.getElementById('answer-input');
-            const submitBtn = document.getElementById('submit-btn');
-            
-            inputEl.value = '';
-            inputEl.disabled = false;
-            submitBtn.disabled = false;
-            
-            document.getElementById('input-area').classList.remove('hidden');
-            document.getElementById('feedback-area').classList.add('hidden');
-            
-            setTimeout(() => inputEl.focus(), 50);
-        }
+                    <div class="mt-auto">
 
-        function submitAnswer(e) {
-            e.preventDefault();
-            if (appState.isAnswered) return;
-            
-            const inputEl = document.getElementById('answer-input');
-            const userInput = inputEl.value.trim();
-            
-            if (userInput === '') return;
 
-            appState.isAnswered = true;
-            inputEl.disabled = true;
-            document.getElementById('submit-btn').disabled = true;
-            
-            document.getElementById('input-area').classList.add('hidden');
-            
-            const currentQ = appState.currentQuestion;
-            const isCorrect = checkCorrectness(userInput, currentQ.a);
+                        <div id="quiz-input-area">
+                            <form onsubmit="quizApp.submitAnswer(event)" class="flex flex-col sm:flex-row gap-3 md:gap-4 items-end">
+                                <div class="w-full">
+                                    <label class="block font-bold uppercase text-xs mb-1 tracking-widest text-gray-400">Answer</label>
+                                    <input type="text" id="quiz-answer-input" class="brutal-input" autocomplete="off">
+                                </div>
+                                <button type="submit" id="quiz-submit-btn" class="brutal-btn black px-8 py-3 w-full sm:w-auto text-base whitespace-nowrap mt-2 sm:mt-0">
+                                    判定
+                                </button>
+                            </form>
+                            <div class="mt-4 md:mt-5 flex justify-end gap-4 md:gap-6 pt-3">
+                                <button type="button" onclick="quizApp.skip()" class="text-xs font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">
+                                    SKIP
+                                </button>
+                                <button type="button" onclick="quizApp.giveUp()" class="text-xs font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">
+                                    GIVE UP
+                                </button>
+                            </div>
+                        </div>
 
-            showFeedback(isCorrect, currentQ);
-        }
 
-        function giveUpQuestion() {
-            if (appState.isAnswered) return;
-            appState.isAnswered = true;
-            
-            document.getElementById('answer-input').disabled = true;
-            document.getElementById('submit-btn').disabled = true;
-            document.getElementById('input-area').classList.add('hidden');
-            
-            const currentQ = appState.currentQuestion;
-            
-            showFeedback('giveup', currentQ);
-        }
+                        <div id="quiz-feedback-area" class="hidden bg-gray-50 border-2 border-black p-5 md:p-6">
+                            <div class="flex items-center gap-3 mb-3 md:mb-4" id="quiz-feedback-header">
 
-        function skipQuestion() {
-            if (appState.isAnswered) return;
-            appState.isAnswered = true;
-            
-            const skipped = appState.remainingQuestions.shift();
-            appState.remainingQuestions.push(skipped);
-            
-            renderQuestion();
-        }
+                            </div>
+                            <div class="mb-5 md:mb-6">
+                                <p class="font-bold text-xs uppercase tracking-widest text-gray-500 mb-1">Correct Answer</p>
+                                <p id="quiz-feedback-answer" class="text-xl md:text-2xl font-black marker-line"></p>
+                            </div>
+                            <button id="quiz-next-btn" onclick="quizApp.next()" class="brutal-btn black w-full py-3 text-base tracking-widest uppercase">
+                                NEXT
+                            </button>
+                        </div>
 
-        function checkCorrectness(input, answers) {
-            const normalize = (str) => {
-                return str.toLowerCase()
-                    .replace(/[\s　]/g, '')
-                    .replace(/[\u30a1-\u30f6]/g, match => String.fromCharCode(match.charCodeAt(0) - 0x60));
-            };
-            const normalizedInput = normalize(input);
-            return answers.some(ans => normalize(ans) === normalizedInput);
-        }
+                    </div>
+                </div>
+            </div>
 
-        function showFeedback(status, questionData) {
-            const area = document.getElementById('feedback-area');
-            const title = document.getElementById('feedback-title');
-            const ansDisplay = document.getElementById('feedback-answers');
-            
-            area.classList.remove('hidden');
-            ansDisplay.innerText = questionData.a.join(' / ');
 
-            if (status === true) {
-                appState.score++;
-                title.innerText = '◯ 正解';
-                title.className = 'text-xl font-bold mb-2 text-black';
-            } else if (status === false) {
-                appState.wrongScore++;
-                appState.mistakes.push(questionData);
-                title.innerText = '× 不正解';
-                title.className = 'text-xl font-bold mb-2 text-gray-500';
-            } else if (status === 'giveup') {
-                appState.wrongScore++;
-                appState.mistakes.push(questionData);
-                title.innerText = '🏳 ギブアップ';
-                title.className = 'text-xl font-bold mb-2 text-gray-500';
-            }
-            
-            updateScoreDisplay();
-        }
+            <div id="screen-result" class="screen w-full">
+                <div class="brutal-box p-6 md:p-10 text-center">
+                    <h2 class="text-2xl md:text-3xl font-black mb-8 md:mb-10 uppercase tracking-widest">RESULT</h2>
 
-        function nextQuestion() {
-            appState.remainingQuestions.shift();
-            
-            if (appState.remainingQuestions.length > 0) {
-                renderQuestion();
-            } else {
-                showResult();
-            }
-        }
+                    <div class="flex flex-row justify-center gap-12 md:gap-20 mb-10 border-b-2 border-black pb-10 border-dashed">
+                        <div>
+                            <p class="font-bold uppercase tracking-widest text-gray-500 text-xs mb-2">SCORE</p>
+                            <p class="text-5xl md:text-6xl font-black"><span id="result-score">0</span><span class="text-xl md:text-2xl text-gray-300 ml-1">/ <span id="result-total">0</span></span></p>
+                        </div>
+                        <div>
+                            <p class="font-bold uppercase tracking-widest text-gray-500 text-xs mb-2">TIME</p>
+                            <p class="text-4xl md:text-5xl font-black mt-2 md:mt-3"><span id="result-time-m">0</span><span class="text-base md:text-lg mx-1 text-gray-400">m</span><span id="result-time-s">0</span><span class="text-base md:text-lg ml-1 text-gray-400">s</span></p>
+                        </div>
+                    </div>
 
-        function showResult() {
-            navigate('result');
-            document.getElementById('result-score').innerText = appState.score;
-            document.getElementById('result-total').innerText = appState.questions.length;
+                    <div id="result-mistakes-area" class="mb-10 text-left hidden">
+                        <h3 class="font-black text-lg mb-4 uppercase tracking-widest text-gray-400">REVIEW</h3>
+                        <ul id="result-mistakes-list" class="space-y-4">
 
-            const mistakesArea = document.getElementById('mistakes-area');
-            const list = document.getElementById('mistakes-list');
-            list.innerHTML = '';
+                        </ul>
+                    </div>
 
-            if (appState.mistakes.length > 0) {
-                mistakesArea.classList.remove('hidden');
-                appState.mistakes.forEach(q => {
-                    const li = document.createElement('li');
-                    li.className = 'border-l-2 border-gray-300 pl-3 py-1';
-                    li.innerHTML = `
-                        <p class="text-gray-600 mb-1">${q.q}</p>
-                        <p class="font-bold">正解：${q.a[0]}</p>
-                    `;
-                    list.appendChild(li);
-                });
-            } else {
-                mistakesArea.classList.add('hidden');
-            }
-        }
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button onclick="quizApp.start(state.currentSubject, state.currentChapter)" class="brutal-btn black px-6 py-4 text-sm tracking-widest uppercase w-full sm:w-auto">
+                            RETRY
+                        </button>
+                        <button onclick="nav.go('subject')" class="brutal-btn px-6 py-4 text-sm tracking-widest uppercase w-full sm:w-auto">
+                            BACK
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        function retryCurrent() {
-            appState.questions = shuffleArray([...appState.questions]);
-            startQuizProcess();
-        }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-    </script>
-</body>
+            <div id="screen-mypage" class="screen w-full">
+                <h2 class="text-2xl font-black mb-6 md:mb-8 border-l-4 border-black pl-3 uppercase tracking-widest">MY PAGE</h2>
+
+                <div class="brutal-box p-5 md:p-6 flex flex-row items-center gap-4 md:gap-5 mb-8 bg-black text-white">
+                    <div id="mypage-avatar" class="w-12 h-12 md:w-14 md:h-14 bg-white text-black flex items-center justify-center font-black text-2xl md:text-3xl">
+                        ?
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="font-bold text-gray-400 text-xs uppercase tracking-widest mb-1">LOGGED IN</p>
+                        <p id="mypage-email" class="text-lg md:text-xl font-black truncate">---</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-10">
+                    <div class="brutal-box p-6 md:p-8 text-center flex flex-col justify-center">
+                        <p class="font-bold uppercase tracking-widest mb-3 text-gray-500 text-xs">ACCURACY</p>
+                        <p class="text-4xl md:text-5xl font-black marker-line"><span id="mypage-accuracy">0</span><span class="text-xl md:text-2xl ml-1">%</span></p>
+                        <p class="font-bold text-gray-400 mt-3 text-xs md:text-sm"><span id="mypage-correct">0</span> / <span id="mypage-answered">0</span> Correct</p>
+                    </div>
+
+                    <div class="brutal-box p-6 md:p-8 text-center flex flex-col justify-center">
+                        <p class="font-bold uppercase tracking-widest mb-3 text-gray-500 text-xs">TOTAL TIME</p>
+                        <p class="text-3xl md:text-4xl font-black pt-1">
+                            <span id="mypage-hours-area" class="hidden"><span id="mypage-hours">0</span><span class="text-lg md:text-xl mx-1 text-gray-400">h</span></span>
+                            <span id="mypage-minutes">0</span><span class="text-lg md:text-xl ml-1 text-gray-400">m</span>
+                        </p>
+                        <p class="font-bold text-gray-400 mt-3 text-xs md:text-sm"><span id="mypage-sessions">0</span> Sessions</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4 md:pt-6 border-t border-gray-300">
+                    <button onclick="authApp.logout()" class="font-bold text-sm text-gray-500 hover:text-black uppercase tracking-widest transition-colors">
+                        LOGOUT
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <script type="module" src="https://ataro-qqq.github.io/1Q1A/users/script.js"></script>
+    </body>
+
 </html>
