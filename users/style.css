@@ -117,3 +117,24 @@ body {
     display: inline-block;
     letter-spacing: 0.05em;
 }
+
+.math-content {
+    font-family: 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    letter-spacing: 0.05em;
+}
+
+.math-italic {
+    font-style: italic;
+}
+
+.math-sup {
+    font-size: 0.6em;
+    vertical-align: super;
+    line-height: 0;
+}
+
+.math-sub {
+    font-size: 0.6em;
+    vertical-align: sub;
+    line-height: 0;
+}
