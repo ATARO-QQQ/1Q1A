@@ -4,17 +4,20 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>一問一答 - 作問・管理</title>
+        <title>一問一答 - 1Q1A ADMIN</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body {
-                font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-                background-color: #fafafa;
-                color: #111;
+                font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+                background-color: #fff;
+                color: #000;
                 min-height: 100vh;
                 margin: 0;
-                background-image: radial-gradient(#d1d5db 1px, transparent 1px);
-                background-size: 20px 20px;
+                background-image:
+                    linear-gradient(#f0f0f0 1px, transparent 1px),
+                    linear-gradient(90deg, #f0f0f0 1px, transparent 1px);
+                background-size: 32px 32px;
+                background-position: center top;
             }
 
             .screen {
@@ -23,13 +26,13 @@
 
             .screen.active {
                 display: block;
-                animation: slideUp 0.3s ease-out;
+                animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             @keyframes slideUp {
                 0% {
                     opacity: 0;
-                    transform: translateY(8px);
+                    transform: translateY(12px);
                 }
 
                 100% {
@@ -39,20 +42,22 @@
             }
 
             .brutal-box {
-                border: 2px solid #111;
-                box-shadow: 4px 4px 0px #111;
+                border: 3px solid #000;
+                box-shadow: 8px 8px 0px #000;
                 background-color: #fff;
                 border-radius: 0;
             }
 
             .brutal-btn {
-                border: 2px solid #111;
-                box-shadow: 3px 3px 0px #111;
+                border: 3px solid #000;
+                box-shadow: 6px 6px 0px #000;
                 background-color: #fff;
-                color: #111;
-                font-weight: 700;
+                color: #000;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
                 cursor: pointer;
-                transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+                transition: all 0.15s ease-out;
                 border-radius: 0;
                 display: inline-flex;
                 align-items: center;
@@ -61,72 +66,100 @@
             }
 
             .brutal-btn:hover:not(:disabled) {
-                background-color: #f3f4f6;
+                background-color: #000;
+                color: #fff;
             }
 
             .brutal-btn:active:not(:disabled) {
-                transform: translate(3px, 3px);
-                box-shadow: 0px 0px 0px #111;
+                transform: translate(6px, 6px);
+                box-shadow: 0px 0px 0px #000;
             }
 
             .brutal-btn.black {
-                background-color: #111;
+                background-color: #000;
                 color: #fff;
             }
 
             .brutal-btn.black:hover:not(:disabled) {
-                background-color: #374151;
+                background-color: #fff;
+                color: #000;
             }
 
             .brutal-btn.danger {
-                background-color: #000;
+                background-color: #fff;
+                color: #dc2626;
+                border-color: #dc2626;
+                box-shadow: 4px 4px 0px #dc2626;
+            }
+
+            .brutal-btn.danger:hover:not(:disabled) {
+                background-color: #dc2626;
                 color: #fff;
                 border-color: #000;
+                box-shadow: 4px 4px 0px #000;
+            }
+
+            .brutal-btn.danger:active:not(:disabled) {
+                transform: translate(4px, 4px);
+                box-shadow: 0px 0px 0px #000;
             }
 
             .brutal-btn:disabled {
-                border-color: #d1d5db;
-                box-shadow: 3px 3px 0px #d1d5db;
-                color: #9ca3af;
+                border-color: #ccc;
+                box-shadow: 6px 6px 0px #ccc;
+                color: #999;
+                background-color: #f9f9f9;
                 cursor: not-allowed;
                 transform: none;
             }
 
-            .brutal-input,
-            .brutal-textarea,
-            .brutal-select {
-                border: 2px solid #111;
+            .brutal-input {
+                border: 3px solid #000;
                 background-color: #fff;
-                padding: 10px 14px;
+                padding: 12px 16px;
                 font-size: 1rem;
                 width: 100%;
                 outline: none;
                 border-radius: 0;
-                transition: background-color 0.2s, border-color 0.2s;
+                transition: all 0.2s;
                 font-weight: 700;
+                box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.03);
             }
 
-            .brutal-input:focus,
-            .brutal-textarea:focus,
-            .brutal-select:focus {
-                background-color: #fefce8;
-                border-color: #000;
+            .brutal-input:focus {
+                background-color: #fafafa;
+                box-shadow: inset 6px 6px 0px rgba(0, 0, 0, 0.08);
+            }
+
+            .tab-container {
+                display: flex;
+                border-bottom: 3px solid #000;
+                margin-bottom: -3px;
             }
 
             .tab-btn {
-                border: 2px solid #111;
-                padding: 8px 16px;
-                font-weight: 700;
+                border: 3px solid #000;
+                border-bottom: none;
+                padding: 12px 24px;
+                font-weight: 800;
                 background-color: #e5e7eb;
                 cursor: pointer;
-                border-bottom: none;
-                margin-right: 4px;
+                margin-right: -3px;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                transition: background-color 0.2s;
+            }
+
+            .tab-btn:hover {
+                background-color: #d1d5db;
             }
 
             .tab-btn.active {
                 background-color: #fff;
+                padding-bottom: 15px;
+                margin-bottom: -3px;
                 position: relative;
-                top: 2px;
+                z-index: 10;
             }
         </style>
     </head>
@@ -135,44 +168,44 @@
 
 
         <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
-            <div class="animate-spin h-10 w-10 border-2 border-black border-t-transparent"></div>
-            <p>LOADING...</p>
+            <div class="animate-spin h-10 w-10 border-4 border-black border-t-transparent"></div>
+            <p class="uppercase font-black tracking-[0.2em]">Loading</p>
         </div>
 
 
-        <header id="header" class="hidden w-full max-w-5xl px-4 md:px-8 py-4 md:py-6 flex justify-between items-end border-b-2 border-black bg-white sticky top-0 z-40">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-black tracking-tighter">1Q1A ADMIN.</h1>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Question Authoring System</p>
+        <header id="header" class="hidden w-full max-w-5xl px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black bg-white/95 backdrop-blur-sm sticky top-0 z-40">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl font-black tracking-tight uppercase">1Q1A ADMIN.</h1>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mt-1">Authoring System</p>
             </div>
-            <nav class="flex gap-4 md:gap-6 text-xs md:text-sm">
-                <button onclick="nav.go('questions')" class="font-bold hover:underline underline-offset-4 decoration-2 uppercase">Questions</button>
-                <button onclick="nav.go('users')" class="font-bold hover:underline underline-offset-4 decoration-2 uppercase">ID Manager</button>
-                <button onclick="authApp.logout()" class="font-bold text-gray-400 hover:text-black uppercase">Logout</button>
+            <nav class="flex flex-wrap justify-center gap-2 md:gap-4 text-sm font-bold uppercase tracking-widest">
+                <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
+                <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
+                <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
             </nav>
         </header>
 
         <main class="w-full max-w-5xl p-4 md:p-8 flex-grow">
 
 
-            <div id="screen-auth" class="screen w-full max-w-md mx-auto mt-10 md:mt-20">
+            <div id="screen-auth" class="screen w-full max-w-md mx-auto mt-6 md:mt-12">
                 <div class="brutal-box p-6 md:p-10">
-                    <h2 class="text-2xl font-black mb-2 text-center uppercase tracking-widest">ADMIN LOGIN</h2>
-                    <p class="text-xs text-center text-gray-500 mb-8 font-bold">作問ユーザー専用ポータル</p>
+                    <h2 class="text-3xl font-black mb-2 text-center uppercase tracking-[0.15em]">Admin Login</h2>
+                    <p class="text-xs text-center text-gray-500 mb-8 font-bold tracking-widest">作問ユーザー専用ポータル</p>
 
-                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6"></div>
+                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6 tracking-wide"></div>
 
-                    <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-5">
+                    <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-6">
                         <div>
-                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Admin Email</label>
+                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-500">Admin Email</label>
                             <input type="email" id="auth-email" required class="brutal-input" placeholder="admin@example.com">
                         </div>
                         <div>
-                            <label class="block font-bold mb-1 uppercase text-xs tracking-wider text-gray-500">Password</label>
+                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-500">Password</label>
                             <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••">
                         </div>
-                        <button type="submit" class="brutal-btn black w-full py-3 text-base tracking-widest mt-6">
-                            ログイン
+                        <button type="submit" class="brutal-btn black w-full py-4 text-lg mt-8">
+                            SIGN IN
                         </button>
                     </form>
                 </div>
@@ -182,66 +215,66 @@
             <div id="screen-questions" class="screen w-full">
 
 
-                <div class="mb-12">
-                    <div class="flex border-b-2 border-black">
-                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active uppercase text-xs md:text-sm">Excel / TSV 括一括入力</button>
-                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn uppercase text-xs md:text-sm">個別手入力</button>
+                <div class="mb-16">
+                    <div class="tab-container">
+                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-xs md:text-sm">Bulk Import (Excel)</button>
+                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn text-xs md:text-sm">Single Entry</button>
                     </div>
 
 
-                    <div id="tab-excel" class="brutal-box p-6 bg-white border-t-0">
-                        <h3 class="font-black text-lg mb-2 uppercase tracking-widest">Excel / スプレッドシートから貼り付け</h3>
-                        <p class="text-xs font-bold text-gray-500 mb-4">
-                            列順序: <span class="text-black bg-gray-200 px-1 py-0.5">教科</span> <span class="text-black bg-gray-200 px-1 py-0.5">単元</span> <span class="text-black bg-gray-200 px-1 py-0.5">問題文</span> <span class="text-black bg-gray-200 px-1 py-0.5">正解1</span> <span class="text-black bg-gray-200 px-1 py-0.5">正解2(任意)</span> ...（タブ区切り）
+                    <div id="tab-excel" class="brutal-box p-6 md:p-8 bg-white border-t-0 relative z-0">
+                        <h3 class="font-black text-xl mb-3 uppercase tracking-[0.1em]">Paste from Spreadsheet</h3>
+                        <p class="text-xs font-bold text-gray-500 mb-6 leading-relaxed">
+                            列順序: <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">教科</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">単元</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">問題文</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">正解1</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">正解2(任意)</span> ... （タブ区切り）
                         </p>
-                        <textarea id="excel-input" class="brutal-textarea h-32 font-mono text-xs md:text-sm mb-4" placeholder="地理探求	1-1 世界の姿	地球の表面積における海の割合は約何％か。	70%	70	71%" oninput="adminApp.parseExcelInput()"></textarea>
+                        <textarea id="excel-input" class="brutal-input h-40 font-mono text-sm mb-6" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
 
 
-                        <div id="excel-preview-area" class="hidden mb-6">
-                            <h4 class="font-bold text-xs uppercase text-gray-500 mb-2">登録プレビュー (<span id="preview-count">0</span>件)</h4>
-                            <div class="max-h-48 overflow-y-auto border-2 border-black">
-                                <table class="w-full text-left text-xs font-bold">
-                                    <thead class="bg-black text-white sticky top-0">
+                        <div id="excel-preview-area" class="hidden mb-8">
+                            <h4 class="font-black text-sm uppercase text-gray-500 mb-3 tracking-[0.1em]">Preview (<span id="preview-count">0</span> items)</h4>
+                            <div class="max-h-64 overflow-y-auto border-3 border-black">
+                                <table class="w-full text-left text-sm font-bold bg-white">
+                                    <thead class="bg-black text-white sticky top-0 z-10">
                                         <tr>
-                                            <th class="p-2 border-r border-gray-700">教科</th>
-                                            <th class="p-2 border-r border-gray-700">単元</th>
-                                            <th class="p-2 border-r border-gray-700">問題文</th>
-                                            <th class="p-2">正解キーワード</th>
+                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">教科</th>
+                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">単元</th>
+                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">問題文</th>
+                                            <th class="p-3 tracking-wider">正解キーワード</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="preview-tbody" class="divide-y divide-gray-300"></tbody>
+                                    <tbody id="preview-tbody" class="divide-y-2 divide-gray-200"></tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase">
-                            一括登録を実行する
+                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-4 text-base tracking-[0.1em]">
+                            EXECUTE IMPORT
                         </button>
                     </div>
 
 
-                    <div id="tab-single" class="brutal-box p-6 bg-white border-t-0 hidden">
-                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div id="tab-single" class="brutal-box p-6 md:p-8 bg-white border-t-0 relative z-0 hidden">
+                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block font-bold text-xs uppercase mb-1 text-gray-500">教科名</label>
+                                    <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
                                     <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
                                 </div>
                                 <div>
-                                    <label class="block font-bold text-xs uppercase mb-1 text-gray-500">単元名</label>
+                                    <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
                                     <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-bold text-xs uppercase mb-1 text-gray-500">問題文</label>
-                                <textarea id="single-q" required class="brutal-input h-20" placeholder="問題文を入力..."></textarea>
+                                <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Question (問題文)</label>
+                                <textarea id="single-q" required class="brutal-input h-24" placeholder="問題文を入力..."></textarea>
                             </div>
                             <div>
-                                <label class="block font-bold text-xs uppercase mb-1 text-gray-500">正解キーワード (カンマ区切りで別解を追加)</label>
+                                <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
                                 <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
                             </div>
-                            <button type="submit" class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase">
-                                問題を追加登録
+                            <button type="submit" class="brutal-btn black w-full py-4 text-base tracking-[0.1em] mt-4">
+                                ADD QUESTION
                             </button>
                         </form>
                     </div>
@@ -249,16 +282,16 @@
 
 
                 <div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
-                        <h3 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3">登録済み問題一覧 (<span id="total-q-count">0</span>)</h3>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-select text-xs py-2">
-                                <option value="">すべての教科</option>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 border-b-3 border-black pb-4">
+                        <h3 class="text-2xl font-black uppercase tracking-[0.1em]">Database (<span id="total-q-count">0</span>)</h3>
+                        <div class="w-full sm:w-64">
+                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-input py-2 px-3 text-sm">
+                                <option value="">ALL SUBJECTS</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="space-y-3" id="questions-list">
+                    <div class="space-y-4" id="questions-list">
 
                     </div>
                 </div>
@@ -266,30 +299,30 @@
             </div>
 
 
-            <div id="screen-users" class="screen w-full max-w-2xl mx-auto">
-                <h2 class="text-2xl font-black mb-2 uppercase tracking-widest border-l-4 border-black pl-3">ID Manager</h2>
-                <p class="text-xs font-bold text-gray-500 mb-8">新しい作問ユーザーの発行・管理を行います。</p>
+            <div id="screen-users" class="screen w-full max-w-3xl mx-auto">
+                <h2 class="text-3xl font-black mb-2 uppercase tracking-[0.1em] border-l-8 border-black pl-4">ID Manager</h2>
+                <p class="text-sm font-bold text-gray-500 mb-10 tracking-widest">新しい作問ユーザーの発行・管理を行います。</p>
 
-                <div class="brutal-box p-6 md:p-8 mb-10">
-                    <h3 class="font-black text-lg mb-6 uppercase border-b-2 border-black pb-2">新規作問ユーザーを発行</h3>
-                    <form onsubmit="adminApp.createUser(event)" class="space-y-4">
+                <div class="brutal-box p-6 md:p-10 mb-12 bg-white">
+                    <h3 class="font-black text-xl mb-8 uppercase border-b-3 border-black pb-3 tracking-[0.1em]">Create New Admin</h3>
+                    <form onsubmit="adminApp.createUser(event)" class="space-y-6">
                         <div>
-                            <label class="block font-bold text-xs uppercase text-gray-500 mb-1">新規登録用 Email</label>
+                            <label class="block font-black text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">New Email</label>
                             <input type="email" id="new-user-email" required class="brutal-input" placeholder="new_author@example.com">
                         </div>
                         <div>
-                            <label class="block font-bold text-xs uppercase text-gray-500 mb-1">初期パスワード</label>
+                            <label class="block font-black text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">Initial Password</label>
                             <input type="password" id="new-user-password" required minlength="6" class="brutal-input" placeholder="••••••••">
                         </div>
-                        <button type="submit" class="brutal-btn black w-full py-3 text-sm tracking-widest uppercase mt-4">
-                            作問ユーザーアカウントを作成
+                        <button type="submit" class="brutal-btn black w-full py-4 text-base tracking-[0.1em] mt-4">
+                            CREATE ACCOUNT
                         </button>
                     </form>
                 </div>
 
                 <div>
-                    <h3 class="font-black text-lg mb-4 uppercase text-gray-500">登録済み作問ユーザー</h3>
-                    <ul id="admin-users-list" class="space-y-2">
+                    <h3 class="font-black text-lg mb-6 uppercase text-gray-500 tracking-[0.1em]">Registered Admins</h3>
+                    <ul id="admin-users-list" class="space-y-3">
 
                     </ul>
                 </div>
@@ -345,7 +378,6 @@
                     onAuthStateChanged(auth, async (user) => {
                         nav.setLoading(true);
                         if (user) {
-                            
                             const isAdmin = await authApp.checkAdminRole(user.uid);
                             if (isAdmin) {
                                 state.user = user;
@@ -365,7 +397,6 @@
                 checkAdminRole: async (uid) => {
                     try {
                         const snap = await getDoc(doc(db, 'admin_users', uid));
-                        
                         const allAdmins = await getDocs(collection(db, 'admin_users'));
                         if (allAdmins.empty) {
                             await setDoc(doc(db, 'admin_users', uid), { email: auth.currentUser.email, createdAt: serverTimestamp() });
@@ -402,7 +433,6 @@
                     $('tab-single-btn').classList.toggle('active', tab === 'single');
                 },
             
-                
                 parseExcelInput: () => {
                     const text = $('excel-input').value.trim();
                     if (!text) {
@@ -418,11 +448,7 @@
                     lines.forEach(line => {
                         const row = line.split('\t').map(cell => cell.trim()).filter(c => c !== '');
                         if (row.length >= 4) {
-                            const subject = row[0];
-                            const chapter = row[1];
-                            const q = row[2];
-                            const a = row.slice(3); 
-                            parsed.push({ subject, chapter, q, a });
+                            parsed.push({ subject: row[0], chapter: row[1], q: row[2], a: row.slice(3) });
                         }
                     });
             
@@ -433,12 +459,12 @@
                     tbody.innerHTML = '';
                     parsed.forEach(item => {
                         const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-gray-100';
+                        tr.className = 'hover:bg-gray-100 transition-colors';
                         tr.innerHTML = `
-                            <td class="p-2 border-r border-gray-300">${item.subject}</td>
-                            <td class="p-2 border-r border-gray-300">${item.chapter}</td>
-                            <td class="p-2 border-r border-gray-300 truncate max-w-xs">${item.q}</td>
-                            <td class="p-2">${item.a.join(' / ')}</td>
+                            <td class="p-3 border-r-2 border-gray-200">${item.subject}</td>
+                            <td class="p-3 border-r-2 border-gray-200">${item.chapter}</td>
+                            <td class="p-3 border-r-2 border-gray-200 truncate max-w-xs">${item.q}</td>
+                            <td class="p-3">${item.a.join(' / ')}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -498,11 +524,10 @@
                         state.questions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                         $('total-q-count').innerText = state.questions.length;
             
-                        
                         const subjects = Array.from(new Set(state.questions.map(q => q.subject))).sort();
                         const filterSelect = $('filter-subject');
                         const currentVal = filterSelect.value;
-                        filterSelect.innerHTML = '<option value="">すべての教科</option>';
+                        filterSelect.innerHTML = '<option value="">ALL SUBJECTS</option>';
                         subjects.forEach(subj => {
                             const opt = document.createElement('option');
                             opt.value = subj;
@@ -530,24 +555,26 @@
                     }
             
                     if (targetQuestions.length === 0) {
-                        list.innerHTML = `<div class="p-6 text-center text-gray-400 font-bold border-2 border-gray-200">問題データが存在しません。</div>`;
+                        list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-widest border-3 border-black bg-gray-50 uppercase">No Questions Found</div>`;
                         return;
                     }
             
                     targetQuestions.forEach(q => {
                         const card = document.createElement('div');
-                        card.className = 'brutal-box p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+                        card.className = 'brutal-box p-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
                         card.innerHTML = `
-                            <div class="flex-grow">
-                                <div class="flex gap-2 text-xs font-bold mb-1">
-                                    <span class="bg-black text-white px-2 py-0.5">${q.subject}</span>
-                                    <span class="bg-gray-200 text-black px-2 py-0.5">${q.chapter}</span>
+                            <div class="flex-grow w-full md:w-auto">
+                                <div class="flex flex-wrap gap-2 text-xs font-black uppercase tracking-wider mb-2">
+                                    <span class="bg-black text-white px-2 py-1">${q.subject}</span>
+                                    <span class="border-2 border-black px-2 py-0.5">${q.chapter}</span>
                                 </div>
-                                <p class="font-bold text-base mb-1">${q.q}</p>
-                                <p class="text-xs font-bold text-gray-500">正解: ${q.a.join(' / ')}</p>
+                                <p class="font-black text-lg mb-2 break-words leading-tight">${q.q}</p>
+                                <p class="text-xs font-bold text-gray-500 bg-gray-100 p-2 border-2 border-dashed border-gray-300">
+                                    <span class="uppercase tracking-widest text-black mr-2">Answers:</span> ${q.a.join(' / ')}
+                                </p>
                             </div>
-                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-xs px-3 py-1.5 whitespace-nowrap">
-                                削除
+                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-xs px-4 py-2 whitespace-nowrap mt-2 md:mt-0 self-end md:self-auto">
+                                DELETE
                             </button>
                         `;
                         list.appendChild(card);
@@ -567,7 +594,6 @@
                     }
                 },
             
-                
                 createUser: async (e) => {
                     e.preventDefault();
                     const email = $('new-user-email').value.trim();
@@ -575,9 +601,7 @@
             
                     nav.setLoading(true);
                     try {
-                        
                         const res = await createUserWithEmailAndPassword(auth, email, password);
-                        
                         await setDoc(doc(db, 'admin_users', res.user.uid), {
                             email: email,
                             createdAt: serverTimestamp()
@@ -602,10 +626,10 @@
                         snap.docs.forEach(d => {
                             const data = d.data();
                             const li = document.createElement('li');
-                            li.className = 'brutal-box p-3 bg-white flex justify-between items-center text-sm font-bold';
+                            li.className = 'brutal-box p-4 bg-white flex flex-col sm:flex-row justify-between sm:items-center text-sm font-bold gap-2 sm:gap-0';
                             li.innerHTML = `
-                                <span>${data.email}</span>
-                                <span class="text-xs text-gray-400">UID: ${d.id.substring(0, 8)}...</span>
+                                <span class="text-base">${data.email}</span>
+                                <span class="text-xs text-gray-500 border border-gray-300 px-2 py-1 bg-gray-50 font-mono">UID: ${d.id.substring(0, 10)}...</span>
                             `;
                             list.appendChild(li);
                         });
