@@ -44,6 +44,40 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
         };
 
+        
+        const mathApp = {
+            keys: [
+                '7', '8', '9', '/', '(', ')',
+                '4', '5', '6', '*', '√', '^',
+                '1', '2', '3', '-', '∫', "'",
+                '0', '.', '=', '+', 'x', 'BS'
+            ],
+            render: () => {
+                const kb = $('math-keyboard');
+                kb.innerHTML = '';
+                mathApp.keys.forEach(k => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'brutal-btn bg-gray-50 p-1 md:p-2 text-xs md:text-sm font-black w-full h-10';
+                    if (k === 'BS') {
+                        btn.classList.add('danger');
+                    }
+                    btn.innerText = k;
+                    btn.onclick = () => mathApp.press(k);
+                    kb.appendChild(btn);
+                });
+            },
+            press: (key) => {
+                const input = $('quiz-answer-input');
+                if (key === 'BS') {
+                    input.value = input.value.slice(0, -1);
+                } else {
+                    input.value += key;
+                }
+                input.focus();
+            }
+        };
+
         const dataApp = {
             ensureUserDoc: async (uid) => {
                 const userDocRef = doc(db, 'users', uid);
@@ -361,16 +395,27 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 q.isAnswered = false;
                 q.qStartTime = Date.now(); 
                 
+                const currentQ = q.questions[q.currentIndex];
+
                 $('quiz-current-num').innerText = q.currentIndex + 1;
                 $('quiz-score').innerText = q.score;
                 $('quiz-mistakes').innerText = q.mistakes.length;
                 
-                $('quiz-question-text').innerText = q.questions[q.currentIndex].q;
+                $('quiz-question-text').innerText = currentQ.q;
                 
                 $('quiz-answer-input').value = '';
                 $('quiz-input-area').classList.remove('hidden');
                 $('quiz-feedback-area').classList.add('hidden');
                 
+                
+                if (currentQ.isMath) {
+                    $('math-keyboard').classList.remove('hidden');
+                    $('math-keyboard').classList.add('grid');
+                } else {
+                    $('math-keyboard').classList.add('hidden');
+                    $('math-keyboard').classList.remove('grid');
+                }
+
                 setTimeout(() => $('quiz-answer-input').focus(), 50);
             },
 
@@ -494,5 +539,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         window.authApp = authApp;
         window.quizApp = quizApp;
         window.dataApp = dataApp;
+        window.mathApp = mathApp; 
 
-        window.onload = () => authApp.init();
+        
+        window.onload = () => { 
+            authApp.init();
+            mathApp.render();
+        };
