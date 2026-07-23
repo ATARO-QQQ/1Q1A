@@ -9,14 +9,15 @@
         <style>
             body {
                 font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-                background-color: #fff;
+                background-color: #f9fafb;
                 color: #000;
                 min-height: 100vh;
                 margin: 0;
+
                 background-image:
-                    linear-gradient(#f0f0f0 1px, transparent 1px),
-                    linear-gradient(90deg, #f0f0f0 1px, transparent 1px);
-                background-size: 32px 32px;
+                    linear-gradient(#e5e7eb 2px, transparent 2px),
+                    linear-gradient(90deg, #e5e7eb 2px, transparent 2px);
+                background-size: 40px 40px;
                 background-position: center top;
             }
 
@@ -26,13 +27,13 @@
 
             .screen.active {
                 display: block;
-                animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             @keyframes slideUp {
                 0% {
                     opacity: 0;
-                    transform: translateY(12px);
+                    transform: translateY(16px);
                 }
 
                 100% {
@@ -53,11 +54,11 @@
                 box-shadow: 6px 6px 0px #000;
                 background-color: #fff;
                 color: #000;
-                font-weight: 800;
+                font-weight: 900;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
                 cursor: pointer;
-                transition: all 0.15s ease-out;
+                transition: all 0.1s ease-out;
                 border-radius: 0;
                 display: inline-flex;
                 align-items: center;
@@ -108,7 +109,7 @@
                 border-color: #ccc;
                 box-shadow: 6px 6px 0px #ccc;
                 color: #999;
-                background-color: #f9f9f9;
+                background-color: #f3f4f6;
                 cursor: not-allowed;
                 transform: none;
             }
@@ -116,50 +117,47 @@
             .brutal-input {
                 border: 3px solid #000;
                 background-color: #fff;
-                padding: 12px 16px;
+                padding: 14px 16px;
                 font-size: 1rem;
                 width: 100%;
                 outline: none;
                 border-radius: 0;
                 transition: all 0.2s;
                 font-weight: 700;
-                box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.03);
+                box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.04);
             }
 
             .brutal-input:focus {
-                background-color: #fafafa;
-                box-shadow: inset 6px 6px 0px rgba(0, 0, 0, 0.08);
+                background-color: #fefce8;
+                box-shadow: inset 6px 6px 0px rgba(0, 0, 0, 0.1);
             }
 
             .tab-container {
                 display: flex;
-                border-bottom: 3px solid #000;
-                margin-bottom: -3px;
+                gap: 12px;
+                margin-bottom: 24px;
             }
 
             .tab-btn {
+                flex: 1;
                 border: 3px solid #000;
-                border-bottom: none;
-                padding: 12px 24px;
-                font-weight: 800;
-                background-color: #e5e7eb;
+                box-shadow: 4px 4px 0px #000;
+                padding: 14px;
+                font-weight: 900;
+                background-color: #fff;
+                color: #000;
                 cursor: pointer;
-                margin-right: -3px;
                 text-transform: uppercase;
-                letter-spacing: 0.1em;
-                transition: background-color 0.2s;
-            }
-
-            .tab-btn:hover {
-                background-color: #d1d5db;
+                letter-spacing: 0.05em;
+                transition: all 0.1s ease-out;
+                text-align: center;
             }
 
             .tab-btn.active {
-                background-color: #fff;
-                padding-bottom: 15px;
-                margin-bottom: -3px;
-                position: relative;
-                z-index: 10;
+                background-color: #000;
+                color: #fff;
+                box-shadow: 0px 0px 0px #000;
+                transform: translate(4px, 4px);
             }
         </style>
     </head>
@@ -167,41 +165,41 @@
     <body class="flex flex-col items-center">
 
 
-        <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
-            <div class="animate-spin h-10 w-10 border-4 border-black border-t-transparent"></div>
-            <p class="uppercase font-black tracking-[0.2em]">Loading</p>
+        <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-xl tracking-widest flex-col gap-4">
+            <div class="animate-spin h-12 w-12 border-4 border-black border-t-transparent"></div>
+            <p class="uppercase font-black tracking-[0.3em]">Loading</p>
         </div>
 
 
-        <header id="header" class="hidden w-full max-w-5xl px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black bg-white/95 backdrop-blur-sm sticky top-0 z-40">
+        <header id="header" class="hidden w-full max-w-6xl px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b-4 border-black bg-white sticky top-0 z-40">
             <div class="text-center md:text-left">
-                <h1 class="text-4xl font-black tracking-tight uppercase">1Q1A ADMIN.</h1>
+                <h1 class="text-3xl md:text-4xl font-black tracking-tight uppercase">1Q1A ADMIN.</h1>
                 <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mt-1">Authoring System</p>
             </div>
             <nav class="flex flex-wrap justify-center gap-2 md:gap-4 text-sm font-bold uppercase tracking-widest">
-                <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
-                <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
-                <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
+                <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-4 py-2 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
+                <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-4 py-2 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
+                <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
             </nav>
         </header>
 
         <main class="w-full max-w-5xl p-4 md:p-8 flex-grow">
 
 
-            <div id="screen-auth" class="screen w-full max-w-md mx-auto mt-6 md:mt-12">
-                <div class="brutal-box p-6 md:p-10">
+            <div id="screen-auth" class="screen w-full max-w-md mx-auto mt-10 md:mt-20">
+                <div class="brutal-box p-8 md:p-10">
                     <h2 class="text-3xl font-black mb-2 text-center uppercase tracking-[0.15em]">Admin Login</h2>
-                    <p class="text-xs text-center text-gray-500 mb-8 font-bold tracking-widest">作問ユーザー専用ポータル</p>
+                    <p class="text-xs text-center text-gray-500 mb-10 font-bold tracking-widest">作問ユーザー専用ポータル</p>
 
-                    <div id="auth-error" class="hidden bg-black text-white p-3 font-bold text-xs mb-6 tracking-wide"></div>
+                    <div id="auth-error" class="hidden bg-black text-white p-4 font-bold text-sm mb-8 tracking-wide leading-relaxed border-2 border-black"></div>
 
                     <form id="auth-form" onsubmit="authApp.handleLogin(event)" class="space-y-6">
                         <div>
-                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-500">Admin Email</label>
+                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-600">Admin Email</label>
                             <input type="email" id="auth-email" required class="brutal-input" placeholder="admin@example.com">
                         </div>
                         <div>
-                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-500">Password</label>
+                            <label class="block font-black mb-2 uppercase text-xs tracking-[0.1em] text-gray-600">Password</label>
                             <input type="password" id="auth-password" required class="brutal-input" placeholder="••••••••">
                         </div>
                         <button type="submit" class="brutal-btn black w-full py-4 text-lg mt-8">
@@ -215,65 +213,73 @@
             <div id="screen-questions" class="screen w-full">
 
 
-                <div class="mb-16">
-                    <div class="tab-container">
-                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-xs md:text-sm">Bulk Import (Excel)</button>
-                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn text-xs md:text-sm">Single Entry</button>
+                <div class="mb-20">
+                    <div class="tab-container flex-col sm:flex-row">
+                        <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-sm">Bulk Import (Excel)</button>
+                        <button id="tab-single-btn" onclick="adminApp.switchTab('single')" class="tab-btn text-sm">Single Entry</button>
                     </div>
 
 
-                    <div id="tab-excel" class="brutal-box p-6 md:p-8 bg-white border-t-0 relative z-0">
-                        <h3 class="font-black text-xl mb-3 uppercase tracking-[0.1em]">Paste from Spreadsheet</h3>
-                        <p class="text-xs font-bold text-gray-500 mb-6 leading-relaxed">
-                            列順序: <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">教科</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">単元</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">問題文</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">正解1</span> <span class="text-black border border-black bg-gray-100 px-1 py-0.5 mx-0.5">正解2(任意)</span> ... （タブ区切り）
-                        </p>
-                        <textarea id="excel-input" class="brutal-input h-40 font-mono text-sm mb-6" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
+                    <div id="tab-excel" class="brutal-box p-6 md:p-10 bg-white">
+                        <h3 class="font-black text-2xl mb-4 uppercase tracking-[0.1em] border-l-8 border-black pl-4">Paste from Spreadsheet</h3>
+                        <div class="bg-gray-100 border-2 border-black p-4 mb-6">
+                            <p class="text-xs font-bold text-gray-600 leading-relaxed uppercase tracking-wider">
+                                列の順序 (タブ区切り): <br class="sm:hidden" />
+                                <span class="text-black font-black bg-white border border-black px-2 py-1 mx-1">教科</span> &rarr;
+                                <span class="text-black font-black bg-white border border-black px-2 py-1 mx-1">単元</span> &rarr;
+                                <span class="text-black font-black bg-white border border-black px-2 py-1 mx-1">問題文</span> &rarr;
+                                <span class="text-black font-black bg-white border border-black px-2 py-1 mx-1">正解1</span> &rarr;
+                                <span class="text-black font-black bg-white border border-black px-2 py-1 mx-1">正解2(任意)</span>
+                            </p>
+                        </div>
+                        <textarea id="excel-input" class="brutal-input h-48 font-mono text-sm mb-8 leading-relaxed" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
 
 
                         <div id="excel-preview-area" class="hidden mb-8">
-                            <h4 class="font-black text-sm uppercase text-gray-500 mb-3 tracking-[0.1em]">Preview (<span id="preview-count">0</span> items)</h4>
-                            <div class="max-h-64 overflow-y-auto border-3 border-black">
-                                <table class="w-full text-left text-sm font-bold bg-white">
+                            <h4 class="font-black text-sm uppercase text-black bg-gray-200 inline-block px-4 py-2 mb-4 tracking-[0.1em] border-2 border-black">Preview (<span id="preview-count">0</span> items)</h4>
+                            <div class="max-h-72 overflow-y-auto border-3 border-black bg-white">
+                                <table class="w-full text-left text-sm font-bold border-collapse">
                                     <thead class="bg-black text-white sticky top-0 z-10">
                                         <tr>
-                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">教科</th>
-                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">単元</th>
-                                            <th class="p-3 border-r-2 border-gray-700 tracking-wider">問題文</th>
-                                            <th class="p-3 tracking-wider">正解キーワード</th>
+                                            <th class="p-4 border-r-2 border-gray-700 tracking-wider">教科</th>
+                                            <th class="p-4 border-r-2 border-gray-700 tracking-wider">単元</th>
+                                            <th class="p-4 border-r-2 border-gray-700 tracking-wider w-1/3">問題文</th>
+                                            <th class="p-4 tracking-wider">正解キーワード</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="preview-tbody" class="divide-y-2 divide-gray-200"></tbody>
+                                    <tbody id="preview-tbody" class="divide-y-2 divide-black"></tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-4 text-base tracking-[0.1em]">
+                        <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-5 text-lg tracking-[0.1em]">
                             EXECUTE IMPORT
                         </button>
                     </div>
 
 
-                    <div id="tab-single" class="brutal-box p-6 md:p-8 bg-white border-t-0 relative z-0 hidden">
-                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div id="tab-single" class="brutal-box p-6 md:p-10 bg-white hidden">
+                        <h3 class="font-black text-2xl mb-8 uppercase tracking-[0.1em] border-l-8 border-black pl-4">Single Entry</h3>
+                        <form onsubmit="adminApp.submitSingle(event)" class="space-y-8">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                 <div>
-                                    <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
+                                    <label class="block font-black text-xs uppercase mb-3 text-gray-500 tracking-[0.1em]">Subject (教科)</label>
                                     <input type="text" id="single-subject" required class="brutal-input" placeholder="例: 地理探求">
                                 </div>
                                 <div>
-                                    <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
+                                    <label class="block font-black text-xs uppercase mb-3 text-gray-500 tracking-[0.1em]">Chapter (単元)</label>
                                     <input type="text" id="single-chapter" required class="brutal-input" placeholder="例: 1-1 世界の姿">
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Question (問題文)</label>
-                                <textarea id="single-q" required class="brutal-input h-24" placeholder="問題文を入力..."></textarea>
+                                <label class="block font-black text-xs uppercase mb-3 text-gray-500 tracking-[0.1em]">Question (問題文)</label>
+                                <textarea id="single-q" required class="brutal-input h-32" placeholder="問題文を入力..."></textarea>
                             </div>
                             <div>
-                                <label class="block font-black text-xs uppercase mb-2 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
+                                <label class="block font-black text-xs uppercase mb-3 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
                                 <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
                             </div>
-                            <button type="submit" class="brutal-btn black w-full py-4 text-base tracking-[0.1em] mt-4">
+                            <button type="submit" class="brutal-btn black w-full py-5 text-lg tracking-[0.1em] mt-4">
                                 ADD QUESTION
                             </button>
                         </form>
@@ -281,17 +287,17 @@
                 </div>
 
 
-                <div>
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4 border-b-3 border-black pb-4">
-                        <h3 class="text-2xl font-black uppercase tracking-[0.1em]">Database (<span id="total-q-count">0</span>)</h3>
-                        <div class="w-full sm:w-64">
-                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-input py-2 px-3 text-sm">
+                <div class="mb-20">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6 border-b-4 border-black pb-4">
+                        <h3 class="text-3xl font-black uppercase tracking-[0.1em]">Database (<span id="total-q-count">0</span>)</h3>
+                        <div class="w-full md:w-72">
+                            <select id="filter-subject" onchange="adminApp.renderQuestionsList()" class="brutal-input py-3 px-4 text-sm font-black uppercase bg-gray-50">
                                 <option value="">ALL SUBJECTS</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="space-y-4" id="questions-list">
+                    <div class="space-y-6" id="questions-list">
 
                     </div>
                 </div>
@@ -300,29 +306,29 @@
 
 
             <div id="screen-users" class="screen w-full max-w-3xl mx-auto">
-                <h2 class="text-3xl font-black mb-2 uppercase tracking-[0.1em] border-l-8 border-black pl-4">ID Manager</h2>
-                <p class="text-sm font-bold text-gray-500 mb-10 tracking-widest">新しい作問ユーザーの発行・管理を行います。</p>
+                <h2 class="text-4xl font-black mb-4 uppercase tracking-[0.1em] border-l-8 border-black pl-6">ID Manager</h2>
+                <p class="text-sm font-bold text-gray-600 mb-12 tracking-widest pl-2">新しい作問ユーザーの発行・管理を行います。</p>
 
-                <div class="brutal-box p-6 md:p-10 mb-12 bg-white">
-                    <h3 class="font-black text-xl mb-8 uppercase border-b-3 border-black pb-3 tracking-[0.1em]">Create New Admin</h3>
-                    <form onsubmit="adminApp.createUser(event)" class="space-y-6">
+                <div class="brutal-box p-8 md:p-12 mb-16 bg-white">
+                    <h3 class="font-black text-2xl mb-10 uppercase border-b-4 border-black pb-4 tracking-[0.1em]">Create New Admin</h3>
+                    <form onsubmit="adminApp.createUser(event)" class="space-y-8">
                         <div>
-                            <label class="block font-black text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">New Email</label>
+                            <label class="block font-black text-xs uppercase text-gray-500 mb-3 tracking-[0.1em]">New Email</label>
                             <input type="email" id="new-user-email" required class="brutal-input" placeholder="new_author@example.com">
                         </div>
                         <div>
-                            <label class="block font-black text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">Initial Password</label>
+                            <label class="block font-black text-xs uppercase text-gray-500 mb-3 tracking-[0.1em]">Initial Password</label>
                             <input type="password" id="new-user-password" required minlength="6" class="brutal-input" placeholder="••••••••">
                         </div>
-                        <button type="submit" class="brutal-btn black w-full py-4 text-base tracking-[0.1em] mt-4">
+                        <button type="submit" class="brutal-btn black w-full py-5 text-lg tracking-[0.1em]">
                             CREATE ACCOUNT
                         </button>
                     </form>
                 </div>
 
                 <div>
-                    <h3 class="font-black text-lg mb-6 uppercase text-gray-500 tracking-[0.1em]">Registered Admins</h3>
-                    <ul id="admin-users-list" class="space-y-3">
+                    <h3 class="font-black text-xl mb-8 uppercase text-black bg-gray-200 inline-block px-4 py-2 border-2 border-black tracking-[0.1em]">Registered Admins</h3>
+                    <ul id="admin-users-list" class="space-y-4">
 
                     </ul>
                 </div>
@@ -346,9 +352,15 @@
                 appId: "1:880525619742:web:fd6cb57926abb4f5ddb40f",
                 measurementId: "G-L8906M810M"
             };
+            
+            
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
+            
+            
+            const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+            const secondaryAuth = getAuth(secondaryApp);
             
             const state = {
                 user: null,
@@ -383,7 +395,7 @@
                                 state.user = user;
                                 nav.go('questions');
                             } else {
-                                alert("作問権限がありません。作問ユーザーアカウントでログインしてください。");
+                                alert("作問権限がありません。管理者アカウントでログインしてください。");
                                 await signOut(auth);
                                 nav.go('auth');
                             }
@@ -395,34 +407,23 @@
                     });
                 },
                 checkAdminRole: async (uid) => {
+                    const userDocRef = doc(db, 'admin_users', uid);
                     try {
-                        
-                        const userDocRef = doc(db, 'admin_users', uid);
                         const snap = await getDoc(userDocRef);
-                        
-                        if (snap.exists()) {
-                            return true;
-                        }
+                        if (snap.exists()) return true;
+                    } catch (e) {
+                        console.log("既存データ参照なし。新規登録を試行します。");
+                    }
             
-                        
-                        
+                    try {
                         await setDoc(userDocRef, {
                             email: auth.currentUser?.email || '',
                             createdAt: serverTimestamp()
                         });
                         return true;
-                    } catch (e) {
-                        console.error("権限チェックエラー:", e);
-                        
-                        try {
-                            await setDoc(doc(db, 'admin_users', uid), {
-                                email: auth.currentUser?.email || '',
-                                createdAt: serverTimestamp()
-                            });
-                            return true;
-                        } catch (err) {
-                            return false;
-                        }
+                    } catch (err) {
+                        console.error("管理者登録失敗:", err);
+                        return false;
                     }
                 },
                 handleLogin: async (e) => {
@@ -478,10 +479,10 @@
                         const tr = document.createElement('tr');
                         tr.className = 'hover:bg-gray-100 transition-colors';
                         tr.innerHTML = `
-                            <td class="p-3 border-r-2 border-gray-200">${item.subject}</td>
-                            <td class="p-3 border-r-2 border-gray-200">${item.chapter}</td>
-                            <td class="p-3 border-r-2 border-gray-200 truncate max-w-xs">${item.q}</td>
-                            <td class="p-3">${item.a.join(' / ')}</td>
+                            <td class="p-3 border-r-2 border-gray-300 font-bold">${item.subject}</td>
+                            <td class="p-3 border-r-2 border-gray-300 font-bold">${item.chapter}</td>
+                            <td class="p-3 border-r-2 border-gray-300 break-words">${item.q}</td>
+                            <td class="p-3 font-bold text-gray-700">${item.a.join(' / ')}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -572,25 +573,25 @@
                     }
             
                     if (targetQuestions.length === 0) {
-                        list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-widest border-3 border-black bg-gray-50 uppercase">No Questions Found</div>`;
+                        list.innerHTML = `<div class="p-10 text-center text-gray-400 font-black tracking-[0.1em] border-4 border-black bg-gray-100 uppercase text-lg">No Questions Found</div>`;
                         return;
                     }
             
                     targetQuestions.forEach(q => {
                         const card = document.createElement('div');
-                        card.className = 'brutal-box p-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4';
+                        card.className = 'brutal-box p-6 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-6';
                         card.innerHTML = `
                             <div class="flex-grow w-full md:w-auto">
-                                <div class="flex flex-wrap gap-2 text-xs font-black uppercase tracking-wider mb-2">
-                                    <span class="bg-black text-white px-2 py-1">${q.subject}</span>
-                                    <span class="border-2 border-black px-2 py-0.5">${q.chapter}</span>
+                                <div class="flex flex-wrap gap-3 text-xs font-black uppercase tracking-wider mb-3">
+                                    <span class="bg-black text-white px-3 py-1.5 shadow-[2px_2px_0px_#ccc]">${q.subject}</span>
+                                    <span class="border-2 border-black px-3 py-1">${q.chapter}</span>
                                 </div>
-                                <p class="font-black text-lg mb-2 break-words leading-tight">${q.q}</p>
-                                <p class="text-xs font-bold text-gray-500 bg-gray-100 p-2 border-2 border-dashed border-gray-300">
-                                    <span class="uppercase tracking-widest text-black mr-2">Answers:</span> ${q.a.join(' / ')}
+                                <p class="font-black text-xl mb-4 break-words leading-relaxed">${q.q}</p>
+                                <p class="text-sm font-bold text-black bg-gray-100 p-3 border-2 border-dashed border-gray-400 inline-block">
+                                    <span class="uppercase tracking-widest text-gray-500 mr-2 text-xs">Answers:</span> ${q.a.join(' / ')}
                                 </p>
                             </div>
-                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-xs px-4 py-2 whitespace-nowrap mt-2 md:mt-0 self-end md:self-auto">
+                            <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-sm px-6 py-3 whitespace-nowrap mt-4 md:mt-0 self-start md:self-center">
                                 DELETE
                             </button>
                         `;
@@ -618,18 +619,35 @@
             
                     nav.setLoading(true);
                     try {
-                        const res = await createUserWithEmailAndPassword(auth, email, password);
+                        
+                        const res = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                        
+                        
                         await setDoc(doc(db, 'admin_users', res.user.uid), {
                             email: email,
                             createdAt: serverTimestamp()
                         });
+            
+                        
+                        await signOut(secondaryAuth);
             
                         alert(`作問ユーザー (${email}) を正常に作成しました。`);
                         $('new-user-email').value = '';
                         $('new-user-password').value = '';
                         await adminApp.loadAdminUsers();
                     } catch (e) {
-                        alert(`ユーザー作成エラー: ${e.message}`);
+                        let errorMessage = e.message;
+                        
+                        
+                        if (e.code === 'auth/email-already-in-use') {
+                            errorMessage = "このメールアドレスは既に登録されています。\n生徒用アカウントと同じアドレスを作問用にする場合は、直接このページでログインしてください（初回ログイン時に権限が付与されます）。";
+                        } else if (e.code === 'auth/weak-password') {
+                            errorMessage = "パスワードは6文字以上で設定してください。";
+                        } else if (e.code === 'auth/invalid-email') {
+                            errorMessage = "メールアドレスの形式が正しくありません。";
+                        }
+            
+                        alert(`エラー: ${errorMessage}`);
                     } finally {
                         nav.setLoading(false);
                     }
@@ -643,10 +661,10 @@
                         snap.docs.forEach(d => {
                             const data = d.data();
                             const li = document.createElement('li');
-                            li.className = 'brutal-box p-4 bg-white flex flex-col sm:flex-row justify-between sm:items-center text-sm font-bold gap-2 sm:gap-0';
+                            li.className = 'brutal-box p-5 bg-white flex flex-col sm:flex-row justify-between sm:items-center text-sm font-bold gap-3 sm:gap-0';
                             li.innerHTML = `
-                                <span class="text-base">${data.email}</span>
-                                <span class="text-xs text-gray-500 border border-gray-300 px-2 py-1 bg-gray-50 font-mono">UID: ${d.id.substring(0, 10)}...</span>
+                                <span class="text-lg font-black break-all pr-4">${data.email}</span>
+                                <span class="text-xs text-gray-500 border-2 border-gray-300 px-3 py-1.5 bg-gray-50 font-mono tracking-widest whitespace-nowrap">UID: ${d.id.substring(0, 10)}...</span>
                             `;
                             list.appendChild(li);
                         });
