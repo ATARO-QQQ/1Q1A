@@ -164,13 +164,12 @@
                 transform: translate(3px, 3px);
             }
 
-            .chapter-badge {
-                background-color: #000;
-                color: #fff;
+            .status-badge {
+                font-weight: 900;
                 padding: 2px 6px;
-                font-weight: 800;
-                display: inline-block;
-                letter-spacing: 0.05em;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                border: 1px solid #000;
             }
         </style>
     </head>
@@ -191,6 +190,7 @@
             </div>
             <nav class="flex flex-wrap justify-center gap-2 md:gap-4 text-xs font-bold uppercase tracking-widest">
                 <button onclick="nav.go('questions')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">QUESTIONS</button>
+                <button onclick="nav.go('students')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">STUDENTS</button>
                 <button onclick="nav.go('users')" class="hover:bg-black hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-black">ID MANAGER</button>
                 <button onclick="authApp.logout()" class="text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 transition-colors border-2 border-transparent hover:border-red-600">LOGOUT</button>
             </nav>
@@ -225,7 +225,6 @@
 
             <div id="screen-questions" class="screen w-full">
 
-
                 <div class="mb-12">
                     <div class="tab-container flex-col sm:flex-row">
                         <button id="tab-excel-btn" onclick="adminApp.switchTab('excel')" class="tab-btn active text-xs md:text-sm">Bulk Import (Excel)</button>
@@ -246,7 +245,6 @@
                             </p>
                         </div>
                         <textarea id="excel-input" class="brutal-input h-32 md:h-40 font-mono text-xs md:text-sm mb-6 leading-relaxed" placeholder="地理探求&#9;1-1 世界の姿&#9;地球の表面積における海の割合は約何％か。&#9;70%&#9;70&#9;71%" oninput="adminApp.parseExcelInput()"></textarea>
-
 
                         <div id="excel-preview-area" class="hidden mb-6">
                             <h4 class="font-black text-xs uppercase text-black bg-gray-200 inline-block px-3 py-1.5 mb-3 tracking-[0.1em] border-2 border-black">Preview (<span id="preview-count">0</span> items)</h4>
@@ -309,12 +307,27 @@
                             </select>
                         </div>
                     </div>
-
                     <div id="questions-list" class="space-y-6">
 
                     </div>
                 </div>
+            </div>
 
+
+            <div id="screen-students" class="screen w-full max-w-4xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-black mb-4 uppercase tracking-[0.1em] border-l-8 border-black pl-4">Student Logs</h2>
+                <p class="text-[10px] md:text-xs font-bold text-gray-500 mb-8 tracking-widest pl-1">解くユーザーの学習状況と履歴を確認します。</p>
+
+                <div class="brutal-box p-5 md:p-6 bg-white mb-8">
+                    <label class="block font-black text-[10px] md:text-xs uppercase text-gray-500 mb-2 tracking-[0.1em]">Search by Name (名前で検索)</label>
+                    <div class="flex gap-4">
+                        <input type="text" id="search-student-name" class="brutal-input flex-grow" placeholder="生徒の表示名を入力..." oninput="adminApp.renderStudentsList()">
+                    </div>
+                </div>
+
+                <div id="students-list" class="space-y-4">
+
+                </div>
             </div>
 
 
@@ -370,7 +383,6 @@
             const auth = getAuth(app);
             const db = getFirestore(app);
             
-            
             const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
             const secondaryAuth = getAuth(secondaryApp);
             
@@ -378,22 +390,25 @@
                 user: null,
                 questions: [],
                 adminUsers: [],
+                students: [],
                 parsedBulkData: [],
-                expandedChapters: new Set(), 
-                editingId: null 
+                expandedChapters: new Set(),
+                editingId: null
             };
             
             const $ = (id) => document.getElementById(id);
             
             const nav = {
-                screens: ['auth', 'questions', 'users'],
+                screens: ['auth', 'questions', 'students', 'users'],
                 go: (targetScreen) => {
                     nav.screens.forEach(s => {
                         const el = $(`screen-${s}`);
                         if (el) el.classList.toggle('active', s === targetScreen);
                     });
                     $('header').classList.toggle('hidden', targetScreen === 'auth');
+                    
                     if (targetScreen === 'questions') adminApp.loadQuestions();
+                    if (targetScreen === 'students') adminApp.loadStudents();
                     if (targetScreen === 'users') adminApp.loadAdminUsers();
                 },
                 setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
@@ -428,12 +443,8 @@
                     } catch (e) {
                         console.log("既存データ参照なし。新規登録を試行します。");
                     }
-            
                     try {
-                        await setDoc(userDocRef, {
-                            email: auth.currentUser?.email || '',
-                            createdAt: serverTimestamp()
-                        });
+                        await setDoc(userDocRef, { email: auth.currentUser?.email || '', createdAt: serverTimestamp() });
                         return true;
                     } catch (err) {
                         console.error("管理者登録失敗:", err);
@@ -465,6 +476,7 @@
                     $('tab-single-btn').classList.toggle('active', tab === 'single');
                 },
             
+                
                 parseExcelInput: () => {
                     const text = $('excel-input').value.trim();
                     if (!text) {
@@ -473,17 +485,14 @@
                         state.parsedBulkData = [];
                         return;
                     }
-            
                     const lines = text.split('\n');
                     const parsed = [];
-            
                     lines.forEach(line => {
                         const row = line.split('\t').map(cell => cell.trim()).filter(c => c !== '');
                         if (row.length >= 4) {
                             parsed.push({ subject: row[0], chapter: row[1], q: row[2], a: row.slice(3) });
                         }
                     });
-            
                     state.parsedBulkData = parsed;
                     $('preview-count').innerText = parsed.length;
             
@@ -500,7 +509,6 @@
                         `;
                         tbody.appendChild(tr);
                     });
-            
                     $('excel-preview-area').classList.remove('hidden');
                     $('excel-submit-btn').disabled = parsed.length === 0;
                 },
@@ -534,7 +542,6 @@
                     const q = $('single-q').value.trim();
                     const aRaw = $('single-a').value.trim();
                     const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
-            
                     nav.setLoading(true);
                     try {
                         await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a });
@@ -567,7 +574,6 @@
                             filterSelect.appendChild(opt);
                         });
                         filterSelect.value = currentVal;
-            
                         adminApp.renderQuestionsList();
                     } catch (e) {
                         console.error(e);
@@ -591,7 +597,6 @@
                         return;
                     }
             
-                    
                     const grouped = {};
                     targetQuestions.forEach(q => {
                         if (!grouped[q.subject]) grouped[q.subject] = {};
@@ -599,33 +604,25 @@
                         grouped[q.subject][q.chapter].push(q);
                     });
             
-                    
                     Object.keys(grouped).sort().forEach(subject => {
-                        
                         const subjDiv = document.createElement('div');
                         subjDiv.className = 'mb-8';
                         subjDiv.innerHTML = `<h4 class="text-xl font-black uppercase tracking-widest border-l-4 border-black pl-3 mb-4">${subject}</h4>`;
                         
                         const chaptersObj = grouped[subject];
-                        
                         Object.keys(chaptersObj).sort().forEach(chapter => {
                             const chapterKey = `${subject}||${chapter}`;
                             const isExpanded = state.expandedChapters.has(chapterKey);
                             const qs = chaptersObj[chapter];
             
-                            
                             const chapterDiv = document.createElement('div');
                             chapterDiv.className = 'brutal-box mb-4 bg-white';
-                            
                             
                             const headerBtn = document.createElement('button');
                             headerBtn.className = 'w-full p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-2 sm:gap-0 focus:outline-none';
                             headerBtn.onclick = () => {
-                                if (state.expandedChapters.has(chapterKey)) {
-                                    state.expandedChapters.delete(chapterKey);
-                                } else {
-                                    state.expandedChapters.add(chapterKey);
-                                }
+                                if (state.expandedChapters.has(chapterKey)) state.expandedChapters.delete(chapterKey);
+                                else state.expandedChapters.add(chapterKey);
                                 adminApp.renderQuestionsList();
                             };
                             headerBtn.innerHTML = `
@@ -634,17 +631,14 @@
                             `;
                             chapterDiv.appendChild(headerBtn);
             
-                            
                             if (isExpanded) {
                                 const contentDiv = document.createElement('div');
                                 contentDiv.className = 'p-4 border-t-2 border-black bg-gray-50 space-y-3';
-                                
                                 qs.forEach(q => {
                                     const qCard = document.createElement('div');
                                     qCard.className = 'border-2 border-black p-3 md:p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4';
                                     
                                     if (state.editingId === q.id) {
-                                        
                                         qCard.innerHTML = `
                                             <form onsubmit="adminApp.saveEdit(event, '${q.id}')" class="w-full flex flex-col gap-3">
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -672,7 +666,6 @@
                                             </form>
                                         `;
                                     } else {
-                                        
                                         qCard.innerHTML = `
                                             <div class="flex-grow w-full md:w-auto">
                                                 <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${q.q}</p>
@@ -680,7 +673,7 @@
                                                     <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.join(' / ')}
                                                 </p>
                                             </div>
-                                            <div class="flex gap-2 self-end md:self-center mt-2 md:mt-0">
+                                            <div class="flex gap-2 self-end md:self-center mt-2 md:mt-0 shrink-0">
                                                 <button onclick="adminApp.startEdit('${q.id}')" class="brutal-btn text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
                                                     EDIT
                                                 </button>
@@ -694,10 +687,8 @@
                                 });
                                 chapterDiv.appendChild(contentDiv);
                             }
-            
                             subjDiv.appendChild(chapterDiv);
                         });
-                        
                         list.appendChild(subjDiv);
                     });
                 },
@@ -714,17 +705,8 @@
                         nav.setLoading(false);
                     }
                 },
-            
-                startEdit: (id) => {
-                    state.editingId = id;
-                    adminApp.renderQuestionsList();
-                },
-            
-                cancelEdit: () => {
-                    state.editingId = null;
-                    adminApp.renderQuestionsList();
-                },
-            
+                startEdit: (id) => { state.editingId = id; adminApp.renderQuestionsList(); },
+                cancelEdit: () => { state.editingId = null; adminApp.renderQuestionsList(); },
                 saveEdit: async (e, id) => {
                     e.preventDefault();
                     const subject = $(`edit-subject-${id}`).value.trim();
@@ -740,39 +722,174 @@
                         await adminApp.loadQuestions();
                     } catch (err) {
                         alert("更新に失敗しました。");
-                        console.error(err);
                     } finally {
                         nav.setLoading(false);
                     }
                 },
             
+                
+                loadStudents: async () => {
+                    nav.setLoading(true);
+                    try {
+                        const snap = await getDocs(collection(db, 'users'));
+                        state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        adminApp.renderStudentsList();
+                    } catch (e) {
+                        console.error("Student load error:", e);
+                        alert("生徒データの取得に失敗しました。Firestoreのルールが正しく更新されているか確認してください。");
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                renderStudentsList: () => {
+                    const list = $('students-list');
+                    list.innerHTML = '';
+                    const query = $('search-student-name').value.toLowerCase().trim();
+            
+                    let targets = state.students;
+                    if (query) {
+                        targets = targets.filter(s => (s.name || '').toLowerCase().includes(query));
+                    }
+            
+                    if (targets.length === 0) {
+                        list.innerHTML = `<div class="p-8 text-center text-gray-400 font-black tracking-[0.1em] border-2 border-black bg-white uppercase text-sm">No Students Found</div>`;
+                        return;
+                    }
+            
+                    targets.forEach(student => {
+                        const stats = student.stats || {};
+                        const accuracy = stats.totalAnswered > 0 ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'brutal-box bg-white mb-4';
+                        
+                        const headerBtn = document.createElement('button');
+                        headerBtn.className = 'w-full p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-left hover:bg-gray-50 transition-colors gap-4 focus:outline-none';
+                        headerBtn.onclick = () => adminApp.toggleStudentLogs(student.id);
+                        
+                        headerBtn.innerHTML = `
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-black text-white flex items-center justify-center font-black text-xl border-2 border-black shrink-0 shadow-[2px_2px_0px_#ccc]">
+                                    ${(student.name || '?').charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-black text-lg md:text-xl uppercase">${student.name || 'No Name'}</p>
+                                    <p class="text-[10px] text-gray-500 font-mono tracking-widest mt-1">${student.email || 'No Email'}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 text-center mt-2 sm:mt-0 border-t-2 border-black sm:border-0 pt-3 sm:pt-0 w-full sm:w-auto justify-around sm:justify-start">
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Accuracy</p>
+                                    <p class="font-black text-xl">${accuracy}%</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Answered</p>
+                                    <p class="font-black text-xl">${stats.totalAnswered || 0}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Time</p>
+                                    <p class="font-black text-xl">${Math.floor((stats.totalTimeSeconds || 0)/60)}m</p>
+                                </div>
+                            </div>
+                        `;
+                        card.appendChild(headerBtn);
+            
+                        const logsContainer = document.createElement('div');
+                        logsContainer.id = `logs-container-${student.id}`;
+                        logsContainer.className = 'hidden border-t-2 border-black bg-gray-50 p-4 md:p-6';
+                        card.appendChild(logsContainer);
+            
+                        list.appendChild(card);
+                    });
+                },
+            
+                toggleStudentLogs: async (studentId) => {
+                    const container = $(`logs-container-${studentId}`);
+                    if (!container.classList.contains('hidden')) {
+                        container.classList.add('hidden');
+                        return;
+                    }
+                    
+                    container.classList.remove('hidden');
+                    container.innerHTML = `<div class="text-center text-sm font-bold uppercase tracking-widest animate-pulse py-4">Loading Logs...</div>`;
+            
+                    try {
+                        const logsRef = collection(db, 'users', studentId, 'logs');
+                        const snap = await getDocs(logsRef); 
+                        
+                        let logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        
+                        logs.sort((a, b) => {
+                            const timeA = a.timestamp?.seconds || 0;
+                            const timeB = b.timestamp?.seconds || 0;
+                            return timeB - timeA;
+                        });
+            
+                        if (logs.length === 0) {
+                            container.innerHTML = `<div class="text-center text-gray-400 font-bold text-xs py-4 uppercase tracking-widest">No Recent Activity</div>`;
+                            return;
+                        }
+            
+                        
+                        const displayLogs = logs.slice(0, 50);
+            
+                        let html = `<h5 class="font-black text-xs uppercase tracking-[0.1em] mb-4 border-b-2 border-black pb-2 text-gray-500">Recent Logs (Latest 50)</h5>`;
+                        html += `<div class="space-y-3 max-h-80 overflow-y-auto pr-2">`;
+                        
+                        displayLogs.forEach(log => {
+                            let resultBadge = '';
+                            if (log.result === 'correct') resultBadge = '<span class="status-badge bg-black text-white">Correct</span>';
+                            else if (log.result === 'wrong') resultBadge = '<span class="status-badge bg-gray-300 text-gray-700">Wrong</span>';
+                            else resultBadge = '<span class="status-badge bg-white text-gray-500">Give Up</span>';
+            
+                            const dateStr = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString('ja-JP', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
+            
+                            html += `
+                                <div class="border-2 border-black bg-white p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                    <div class="flex-grow w-full sm:w-auto">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            ${resultBadge}
+                                            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${log.subject} / ${log.chapter}</span>
+                                        </div>
+                                        <p class="font-black text-sm md:text-base text-gray-900 break-words leading-snug">${log.questionText}</p>
+                                    </div>
+                                    <div class="flex items-center gap-4 text-xs font-black sm:text-right shrink-0 border-t-2 border-dashed border-gray-200 sm:border-0 pt-2 sm:pt-0 w-full sm:w-auto justify-between sm:justify-end">
+                                        <div class="text-gray-800 whitespace-nowrap border-2 border-black px-2 py-1 bg-gray-100">${log.timeSeconds || 0}s</div>
+                                        <div class="text-gray-400 text-[10px] whitespace-nowrap font-mono">${dateStr}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+            
+                        html += `</div>`;
+                        container.innerHTML = html;
+            
+                    } catch (e) {
+                        console.error(e);
+                        container.innerHTML = `<div class="text-center text-red-500 font-bold text-xs py-4 uppercase">Failed to load logs. Rules issue?</div>`;
+                    }
+                },
+            
+                
                 createUser: async (e) => {
                     e.preventDefault();
                     const email = $('new-user-email').value.trim();
                     const password = $('new-user-password').value.trim();
-            
                     nav.setLoading(true);
                     try {
                         const res = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                        await setDoc(doc(db, 'admin_users', res.user.uid), {
-                            email: email,
-                            createdAt: serverTimestamp()
-                        });
+                        await setDoc(doc(db, 'admin_users', res.user.uid), { email: email, createdAt: serverTimestamp() });
                         await signOut(secondaryAuth);
-            
                         alert(`作問ユーザー (${email}) を正常に作成しました。`);
                         $('new-user-email').value = '';
                         $('new-user-password').value = '';
                         await adminApp.loadAdminUsers();
                     } catch (e) {
                         let errorMessage = e.message;
-                        if (e.code === 'auth/email-already-in-use') {
-                            errorMessage = "このメールアドレスは既に登録されています。\n生徒用アカウントと同じアドレスを作問用にする場合は、直接このページでログインしてください（初回ログイン時に権限が付与されます）。";
-                        } else if (e.code === 'auth/weak-password') {
-                            errorMessage = "パスワードは6文字以上で設定してください。";
-                        } else if (e.code === 'auth/invalid-email') {
-                            errorMessage = "メールアドレスの形式が正しくありません。";
-                        }
+                        if (e.code === 'auth/email-already-in-use') errorMessage = "このメールアドレスは既に登録されています。";
+                        else if (e.code === 'auth/weak-password') errorMessage = "パスワードは6文字以上で設定してください。";
+                        else if (e.code === 'auth/invalid-email') errorMessage = "メールアドレスの形式が正しくありません。";
                         alert(`エラー: ${errorMessage}`);
                     } finally {
                         nav.setLoading(false);
