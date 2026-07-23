@@ -353,7 +353,7 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
             import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
                 from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp } 
+            import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, writeBatch, serverTimestamp, updateDoc } 
                 from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
             
             const firebaseConfig = {
@@ -379,7 +379,8 @@
                 questions: [],
                 adminUsers: [],
                 parsedBulkData: [],
-                expandedChapters: new Set() 
+                expandedChapters: new Set(), 
+                editingId: null 
             };
             
             const $ = (id) => document.getElementById(id);
@@ -641,17 +642,54 @@
                                 qs.forEach(q => {
                                     const qCard = document.createElement('div');
                                     qCard.className = 'border-2 border-black p-3 md:p-4 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4';
-                                    qCard.innerHTML = `
-                                        <div class="flex-grow w-full md:w-auto">
-                                            <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${q.q}</p>
-                                            <p class="text-xs font-bold text-gray-700 bg-gray-100 p-2 border-2 border-dashed border-gray-300 inline-block">
-                                                <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.join(' / ')}
-                                            </p>
-                                        </div>
-                                        <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap self-end md:self-center">
-                                            DELETE
-                                        </button>
-                                    `;
+                                    
+                                    if (state.editingId === q.id) {
+                                        
+                                        qCard.innerHTML = `
+                                            <form onsubmit="adminApp.saveEdit(event, '${q.id}')" class="w-full flex flex-col gap-3">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Subject</label>
+                                                        <input type="text" id="edit-subject-${q.id}" required class="brutal-input text-xs py-2" value="${q.subject}">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Chapter</label>
+                                                        <input type="text" id="edit-chapter-${q.id}" required class="brutal-input text-xs py-2" value="${q.chapter}">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Question</label>
+                                                    <textarea id="edit-q-${q.id}" required class="brutal-input text-xs py-2 h-16">${q.q}</textarea>
+                                                </div>
+                                                <div>
+                                                    <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Answers (カンマ区切り)</label>
+                                                    <input type="text" id="edit-a-${q.id}" required class="brutal-input text-xs py-2" value="${q.a.join(', ')}">
+                                                </div>
+                                                <div class="flex justify-end gap-3 mt-2">
+                                                    <button type="button" onclick="adminApp.cancelEdit()" class="brutal-btn text-[10px] md:text-xs px-4 py-2">CANCEL</button>
+                                                    <button type="submit" class="brutal-btn black text-[10px] md:text-xs px-4 py-2">SAVE</button>
+                                                </div>
+                                            </form>
+                                        `;
+                                    } else {
+                                        
+                                        qCard.innerHTML = `
+                                            <div class="flex-grow w-full md:w-auto">
+                                                <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${q.q}</p>
+                                                <p class="text-xs font-bold text-gray-700 bg-gray-100 p-2 border-2 border-dashed border-gray-300 inline-block">
+                                                    <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.join(' / ')}
+                                                </p>
+                                            </div>
+                                            <div class="flex gap-2 self-end md:self-center mt-2 md:mt-0">
+                                                <button onclick="adminApp.startEdit('${q.id}')" class="brutal-btn text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
+                                                    EDIT
+                                                </button>
+                                                <button onclick="adminApp.deleteQuestion('${q.id}')" class="brutal-btn danger text-[10px] md:text-xs px-3 py-1.5 whitespace-nowrap">
+                                                    DELETE
+                                                </button>
+                                            </div>
+                                        `;
+                                    }
                                     contentDiv.appendChild(qCard);
                                 });
                                 chapterDiv.appendChild(contentDiv);
@@ -672,6 +710,37 @@
                         await adminApp.loadQuestions();
                     } catch (e) {
                         alert("削除に失敗しました。");
+                    } finally {
+                        nav.setLoading(false);
+                    }
+                },
+            
+                startEdit: (id) => {
+                    state.editingId = id;
+                    adminApp.renderQuestionsList();
+                },
+            
+                cancelEdit: () => {
+                    state.editingId = null;
+                    adminApp.renderQuestionsList();
+                },
+            
+                saveEdit: async (e, id) => {
+                    e.preventDefault();
+                    const subject = $(`edit-subject-${id}`).value.trim();
+                    const chapter = $(`edit-chapter-${id}`).value.trim();
+                    const q = $(`edit-q-${id}`).value.trim();
+                    const aRaw = $(`edit-a-${id}`).value.trim();
+                    const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+            
+                    nav.setLoading(true);
+                    try {
+                        await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a });
+                        state.editingId = null;
+                        await adminApp.loadQuestions();
+                    } catch (err) {
+                        alert("更新に失敗しました。");
+                        console.error(err);
                     } finally {
                         nav.setLoading(false);
                     }
