@@ -263,6 +263,14 @@
                             </div>
                         </div>
 
+
+                        <div class="mb-5 flex items-center">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" id="excel-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer">
+                                <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">この一括入力の問題を「数学系 (専用キーボード)」として登録する</span>
+                            </label>
+                        </div>
+
                         <button id="excel-submit-btn" onclick="adminApp.submitBulk()" disabled class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em]">
                             EXECUTE IMPORT
                         </button>
@@ -290,6 +298,15 @@
                                 <label class="block font-black text-[10px] uppercase mb-1.5 text-gray-500 tracking-[0.1em]">Answers (正解キーワード / カンマ区切り)</label>
                                 <input type="text" id="single-a" required class="brutal-input" placeholder="例: ロシア, ロシア連邦">
                             </div>
+
+
+                            <div class="pt-2">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" id="single-is-math" class="w-5 h-5 border-2 border-black accent-black cursor-pointer">
+                                    <span class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-700 group-hover:text-black transition-colors">「数学系 (専用キーボード)」として登録する</span>
+                                </label>
+                            </div>
+
                             <button type="submit" class="brutal-btn black w-full py-4 text-sm md:text-base tracking-[0.1em] mt-2">
                                 ADD QUESTION
                             </button>
@@ -516,15 +533,18 @@
                 submitBulk: async () => {
                     if (state.parsedBulkData.length === 0) return;
                     nav.setLoading(true);
+                    const isMath = $('excel-is-math').checked;
                     try {
                         const batch = writeBatch(db);
                         state.parsedBulkData.forEach(data => {
                             const newDocRef = doc(collection(db, 'questions'));
+                            data.isMath = isMath;
                             batch.set(newDocRef, data);
                         });
                         await batch.commit();
                         alert(`${state.parsedBulkData.length} 件の問題を一括登録しました。`);
                         $('excel-input').value = '';
+                        $('excel-is-math').checked = false;
                         adminApp.parseExcelInput();
                         await adminApp.loadQuestions();
                     } catch (e) {
@@ -542,12 +562,15 @@
                     const q = $('single-q').value.trim();
                     const aRaw = $('single-a').value.trim();
                     const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+                    const isMath = $('single-is-math').checked;
+            
                     nav.setLoading(true);
                     try {
-                        await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a });
+                        await setDoc(doc(collection(db, 'questions')), { subject, chapter, q, a, isMath });
                         alert("問題を追加しました。");
                         $('single-q').value = '';
                         $('single-a').value = '';
+                        $('single-is-math').checked = false;
                         await adminApp.loadQuestions();
                     } catch (e) {
                         alert("登録に失敗しました。");
@@ -659,6 +682,13 @@
                                                     <label class="block font-black text-[10px] uppercase mb-1 text-gray-500 tracking-[0.1em]">Answers (カンマ区切り)</label>
                                                     <input type="text" id="edit-a-${q.id}" required class="brutal-input text-xs py-2" value="${q.a.join(', ')}">
                                                 </div>
+                                                <!-- ここに追加：編集用 数学チェック -->
+                                                <div class="mt-1">
+                                                    <label class="flex items-center gap-2 cursor-pointer">
+                                                        <input type="checkbox" id="edit-is-math-${q.id}" class="w-4 h-4 border-2 border-black accent-black cursor-pointer" ${q.isMath ? 'checked' : ''}>
+                                                        <span class="font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-700">「数学系 (専用キーボード)」とする</span>
+                                                    </label>
+                                                </div>
                                                 <div class="flex justify-end gap-3 mt-2">
                                                     <button type="button" onclick="adminApp.cancelEdit()" class="brutal-btn text-[10px] md:text-xs px-4 py-2">CANCEL</button>
                                                     <button type="submit" class="brutal-btn black text-[10px] md:text-xs px-4 py-2">SAVE</button>
@@ -666,9 +696,12 @@
                                             </form>
                                         `;
                                     } else {
+                                        
+                                        const mathBadge = q.isMath ? `<span class="bg-black text-white text-[10px] px-1.5 py-0.5 border-2 border-black tracking-widest uppercase mr-2 shadow-[2px_2px_0px_#ccc]">MATH</span>` : '';
+                                        
                                         qCard.innerHTML = `
                                             <div class="flex-grow w-full md:w-auto">
-                                                <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${q.q}</p>
+                                                <p class="font-black text-sm md:text-base mb-2 break-words leading-snug">${mathBadge}${q.q}</p>
                                                 <p class="text-xs font-bold text-gray-700 bg-gray-100 p-2 border-2 border-dashed border-gray-300 inline-block">
                                                     <span class="uppercase tracking-widest text-black mr-1 text-[10px]">A:</span> ${q.a.join(' / ')}
                                                 </p>
@@ -714,10 +747,11 @@
                     const q = $(`edit-q-${id}`).value.trim();
                     const aRaw = $(`edit-a-${id}`).value.trim();
                     const a = aRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+                    const isMath = $(`edit-is-math-${id}`).checked;
             
                     nav.setLoading(true);
                     try {
-                        await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a });
+                        await updateDoc(doc(db, 'questions', id), { subject, chapter, q, a, isMath });
                         state.editingId = null;
                         await adminApp.loadQuestions();
                     } catch (err) {
