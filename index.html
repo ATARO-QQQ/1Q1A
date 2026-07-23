@@ -160,14 +160,10 @@
     </head>
 
     <body class="flex flex-col items-center">
-
-
         <div id="loading" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex items-center justify-center font-bold text-lg tracking-widest flex-col gap-3">
             <div class="animate-spin h-8 w-8 border-4 border-black border-t-transparent"></div>
             <p class="uppercase font-black tracking-[0.2em]">Loading</p>
         </div>
-
-
         <header id="header" class="hidden w-full max-w-4xl px-4 md:px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3 border-b-2 border-black bg-white sticky top-0 z-40 shadow-[0_4px_0_0_#f8fafc]">
             <h1 class="text-2xl md:text-3xl font-black tracking-tight uppercase">1Q1A.</h1>
             <nav class="flex gap-4 md:gap-6 text-xs md:text-sm font-bold uppercase tracking-widest">
@@ -175,16 +171,11 @@
                 <button onclick="nav.go('mypage')" class="hover:bg-black hover:text-white px-2 py-1 transition-colors border-2 border-transparent hover:border-black">MY PAGE</button>
             </nav>
         </header>
-
         <main class="w-full max-w-4xl p-4 md:p-6 flex-grow flex flex-col items-center">
-
-
             <div id="screen-auth" class="screen w-full max-w-sm mt-6 md:mt-10">
                 <div class="brutal-box p-6 md:p-8">
                     <h2 id="auth-title" class="text-2xl font-black mb-6 text-center uppercase tracking-[0.1em]">Login</h2>
-
                     <div id="auth-error" class="hidden bg-black text-white p-2 font-bold text-xs mb-5 tracking-wide"></div>
-
                     <form id="auth-form" onsubmit="authApp.handleSubmit(event)" class="space-y-5">
                         <div>
                             <label class="block font-black mb-1 uppercase text-[10px] md:text-xs tracking-[0.1em] text-gray-500">Email</label>
@@ -198,7 +189,6 @@
                             <span id="auth-submit-text">SIGN IN</span>
                         </button>
                     </form>
-
                     <div class="mt-6 text-center">
                         <button onclick="authApp.toggleMode()" class="text-[10px] md:text-xs font-black border-b border-black pb-0.5 hover:border-transparent transition-colors text-gray-600 hover:text-black uppercase tracking-widest">
                             <span id="auth-toggle-text">Create Account</span>
@@ -206,48 +196,33 @@
                     </div>
                 </div>
             </div>
-
-
             <div id="screen-home" class="screen w-full">
                 <h2 class="text-xl md:text-2xl font-black mb-5 md:mb-6 border-l-4 border-black pl-3 uppercase tracking-widest">Select Subject</h2>
-
                 <div id="subject-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                 </div>
-
                 <div id="no-data-msg" class="hidden brutal-box p-5 text-center font-bold mt-6">
                     <p class="text-base mb-1 uppercase tracking-widest font-black">No Data</p>
                     <p class="text-[10px] md:text-xs text-gray-500 font-bold tracking-wide">作問ページからデータを追加してください。</p>
                 </div>
             </div>
-
-
             <div id="screen-subject" class="screen w-full">
                 <button onclick="nav.go('home')" class="font-black mb-4 hover:bg-black hover:text-white px-2 py-1 transition-colors text-[10px] md:text-xs uppercase tracking-widest border-2 border-transparent hover:border-black">
                     &larr; BACK
                 </button>
-
                 <h2 id="subject-title" class="text-2xl md:text-3xl font-black mb-8 tracking-tighter uppercase border-b-2 border-black pb-3 break-words">Subject Name</h2>
-
                 <div class="mb-8">
                     <h3 class="text-base md:text-lg font-black mb-4 uppercase tracking-[0.1em] text-gray-400">Chapters</h3>
                     <div id="chapter-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-
                     </div>
                 </div>
-
                 <div class="pt-4">
                     <button onclick="quizApp.start(state.currentSubject, null)" class="brutal-btn black w-full py-3 md:py-4 text-sm md:text-base tracking-[0.1em] uppercase">
                         Shuffle All Chapters
                     </button>
                 </div>
             </div>
-
-
             <div id="screen-quiz" class="screen w-full">
                 <div class="brutal-box p-4 md:p-6 flex flex-col min-h-[300px] md:min-h-[350px]">
-
-
                     <div class="flex flex-wrap justify-between items-center border-b-2 border-black pb-3 mb-5 gap-2">
                         <div class="font-bold text-xs md:text-sm tracking-wider text-gray-700 flex flex-wrap items-center gap-1.5">
                             <span id="quiz-subject-name" class="font-black text-black"></span>
@@ -260,37 +235,24 @@
                             <div class="text-gray-400 ml-1">X:<span id="quiz-mistakes" class="text-black ml-0.5">0</span></div>
                         </div>
                     </div>
-
-
                     <div id="quiz-question-text" class="text-lg md:text-xl font-black leading-relaxed mb-6 flex-grow tracking-wide break-words">
                         問題文
                     </div>
-
-
                     <div class="mt-auto">
-
-
                         <div id="quiz-input-area">
                             <form onsubmit="quizApp.submitAnswer(event)" class="flex flex-col sm:flex-row gap-2 md:gap-3 items-stretch sm:items-end">
                                 <div class="flex-1 relative">
                                     <label class="block font-black uppercase text-[10px] md:text-xs mb-1 tracking-widest text-gray-500">Answer</label>
-
-
                                     <div id="quiz-math-preview" class="hidden w-full min-h-[44px] bg-blue-50 border-2 border-black border-b-0 px-3 py-2 text-lg md:text-xl font-bold flex items-center overflow-x-auto text-blue-800">
                                     </div>
-
                                     <input type="text" id="quiz-answer-input" class="brutal-input h-10 md:h-11" autocomplete="off" placeholder="解答を入力..." oninput="quizApp.updatePreview()">
                                 </div>
                                 <button type="submit" id="quiz-submit-btn" class="brutal-btn black h-10 md:h-11 px-6 text-sm font-black whitespace-nowrap mt-2 sm:mt-0">
                                     判定
                                 </button>
                             </form>
-
-
                             <div id="math-keyboard" class="hidden grid-cols-6 gap-1 md:gap-2 mt-4">
-
                             </div>
-
                             <div class="mt-4 md:mt-5 flex justify-end gap-4 md:gap-5 pt-3 border-t-2 border-dashed border-gray-300">
                                 <button type="button" onclick="quizApp.skip()" class="text-[10px] md:text-xs font-black text-gray-500 hover:text-black uppercase tracking-widest transition-colors border-b border-transparent hover:border-black pb-0.5">
                                     SKIP
@@ -300,11 +262,8 @@
                                 </button>
                             </div>
                         </div>
-
-
                         <div id="quiz-feedback-area" class="hidden bg-black text-white border-2 border-black p-5 md:p-6">
                             <div class="flex items-center gap-3 mb-3" id="quiz-feedback-header">
-
                             </div>
                             <div class="mb-5">
                                 <p class="font-black text-[10px] md:text-xs uppercase tracking-widest text-gray-400 mb-1">Correct Answer</p>
@@ -314,16 +273,12 @@
                                 NEXT
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
-
-
             <div id="screen-result" class="screen w-full">
                 <div class="brutal-box p-6 md:p-8 text-center max-w-2xl mx-auto">
                     <h2 class="text-2xl md:text-3xl font-black mb-8 uppercase tracking-[0.1em]">Result</h2>
-
                     <div class="flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-16 mb-8 border-y-2 border-black py-8">
                         <div class="w-full sm:w-auto">
                             <p class="font-black uppercase tracking-[0.2em] text-gray-500 text-[10px] md:text-xs mb-2">Score</p>
@@ -335,14 +290,11 @@
                             <p class="text-4xl md:text-5xl font-black leading-none"><span id="result-time-m">0</span><span class="text-lg md:text-xl mx-1 text-gray-400">m</span><span id="result-time-s">0</span><span class="text-lg md:text-xl ml-1 text-gray-400">s</span></p>
                         </div>
                     </div>
-
                     <div id="result-mistakes-area" class="mb-10 text-left hidden">
                         <h3 class="font-black text-lg mb-4 uppercase tracking-[0.1em] border-l-4 border-black pl-2">Review</h3>
                         <ul id="result-mistakes-list" class="space-y-3">
-
                         </ul>
                     </div>
-
                     <div class="flex flex-col sm:flex-row justify-center gap-3 md:gap-4">
                         <button onclick="quizApp.start(state.currentSubject, state.currentChapter)" class="brutal-btn black px-6 py-3 text-sm md:text-base tracking-[0.1em] uppercase w-full sm:w-auto flex-1">
                             RETRY
@@ -353,12 +305,8 @@
                     </div>
                 </div>
             </div>
-
-
             <div id="screen-mypage" class="screen w-full">
                 <h2 class="text-2xl font-black mb-6 border-l-4 border-black pl-3 uppercase tracking-[0.1em]">My Page</h2>
-
-
                 <div class="brutal-box p-4 md:p-5 mb-8 bg-black text-white">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-5 mb-4">
                         <div id="mypage-avatar" class="w-12 h-12 md:w-14 md:h-14 bg-white text-black flex items-center justify-center font-black text-2xl shrink-0 border-2 border-black">
@@ -369,8 +317,6 @@
                             <p id="mypage-email" class="text-lg md:text-xl font-black truncate">---</p>
                         </div>
                     </div>
-
-
                     <form onsubmit="dataApp.saveName(event)" class="border-t border-gray-800 pt-4 mt-2 flex flex-col sm:flex-row gap-2 items-stretch sm:items-end">
                         <div class="flex-1">
                             <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Display Name (表示名)</label>
@@ -381,15 +327,12 @@
                         </button>
                     </form>
                 </div>
-
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6">
                     <div class="brutal-box p-5 md:p-6 text-center flex flex-col justify-center bg-gray-50">
                         <p class="font-black uppercase tracking-[0.1em] mb-2 text-gray-400 text-[10px] md:text-xs">Overall Accuracy</p>
                         <p class="text-4xl md:text-5xl font-black"><span id="mypage-accuracy">0</span><span class="text-xl md:text-2xl ml-1 text-gray-400">%</span></p>
                         <p class="font-bold text-gray-500 mt-2 text-[10px] md:text-xs bg-white border-2 border-black inline-block px-2 py-1 mx-auto"><span id="mypage-correct" class="text-black">0</span> / <span id="mypage-answered">0</span> Correct</p>
                     </div>
-
                     <div class="brutal-box p-5 md:p-6 text-center flex flex-col justify-center bg-gray-50">
                         <p class="font-black uppercase tracking-[0.1em] mb-2 text-gray-400 text-[10px] md:text-xs">Total Study Time</p>
                         <p class="text-3xl md:text-4xl font-black">
@@ -399,8 +342,6 @@
                         <p class="font-bold text-gray-500 mt-2 text-[10px] md:text-xs bg-white border-2 border-black inline-block px-2 py-1 mx-auto"><span id="mypage-sessions" class="text-black">0</span> Sessions</p>
                     </div>
                 </div>
-
-
                 <div class="brutal-box p-5 md:p-6 bg-white mb-6">
                     <h3 class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-4 border-b-2 border-black pb-2">Per Question Speed</h3>
                     <div class="grid grid-cols-3 gap-2 md:gap-4 text-center">
@@ -418,8 +359,6 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="brutal-box p-5 md:p-6 bg-white mb-8">
                     <h3 class="font-black text-xs md:text-sm uppercase tracking-widest text-gray-500 mb-4 border-b-2 border-black pb-2">Personal Records</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-center">
@@ -433,16 +372,13 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="pt-2">
                     <button onclick="authApp.logout()" class="brutal-btn danger w-full py-3 md:py-4 text-sm md:text-base tracking-[0.1em] uppercase">
                         LOGOUT
                     </button>
                 </div>
             </div>
-
         </main>
-
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
             import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
@@ -473,38 +409,31 @@
             
             const $ = (id) => document.getElementById(id);
             
-            
             const utils = {
-            formatMath: (text, isMath) => {
-                if (text === undefined || text === null) return "";
-                let str = String(text);
-                
-                str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                
-                if (!isMath) return str;
-
-                
-                str = str.replace(/-&gt;/g, '→').replace(/\*/g, '×');
-
-                
-                str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
-                str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
-                
-                
-                str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
-                str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
-                
-                
-                str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
-                str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
-
-                
-                str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
-
-                
-                return `<span class="math-content">${str}</span>`;
-            }
-        };
+                formatMath: (text, isMath) => {
+                    if (text === undefined || text === null) return "";
+                    let str = String(text);
+                    
+                    str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    
+                    if (!isMath) return str;
+                    
+                    str = str.replace(/->/g, '→').replace(/\*/g, '×');
+                    
+                    str = str.replace(/∫\[(.*?) to (.*?)\]/g, '∫<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                    str = str.replace(/∑\[(.*?) to (.*?)\]/g, '∑<sub class="math-sub">$1</sub><sup class="math-sup">$2</sup>');
+                    
+                    str = str.replace(/\^\((.*?)\)/g, '<sup class="math-sup">$1</sup>');
+                    str = str.replace(/\^([a-zA-Z0-9]+)/g, '<sup class="math-sup">$1</sup>');
+                    
+                    str = str.replace(/_\((.*?)\)/g, '<sub class="math-sub">$1</sub>');
+                    str = str.replace(/_([a-zA-Z0-9]+)/g, '<sub class="math-sub">$1</sub>');
+                    
+                    str = str.replace(/(?<![a-zA-Z])(x|y|n|a|b|k|i|r|e|t|u|c|C)(?![a-zA-Z])/g, '<span class="math-italic">$1</span>');
+                    
+                    return `<span class="math-content">${str}</span>`;
+                }
+            };
             
             const nav = {
                 screens: ['auth', 'home', 'subject', 'quiz', 'result', 'mypage'],
@@ -522,7 +451,6 @@
                 },
                 setLoading: (isLoading) => $('loading').classList.toggle('hidden', !isLoading)
             };
-            
             
             const mathApp = {
                 keys: [
@@ -663,7 +591,6 @@
                         const newTotalTime = (currStats.totalTimeSeconds || 0) + sessionTimeSec;
                         const newSessionCount = (currStats.sessionCount || 0) + 1;
             
-                        
                         let minTime = currStats.minQuestionTime;
                         let maxTime = currStats.maxQuestionTime || 0;
             
@@ -672,7 +599,6 @@
                             if (t > maxTime) maxTime = t;
                         });
             
-                        
                         const currentAcc = total > 0 ? Math.round((correct / total) * 100) : 0;
                         let bestAcc = currStats.bestAccuracy || 0;
                         if (currentAcc > bestAcc) bestAcc = currentAcc;
@@ -728,7 +654,6 @@
                                 }
                             }
                         });
-                        
                         
                         state.subjects = Object.keys(grouped).map(subjName => {
                             const subjData = grouped[subjName];
@@ -859,11 +784,9 @@
                     const hours = Math.floor(totalTimeSeconds / 3600);
                     const minutes = Math.floor((totalTimeSeconds % 3600) / 60);
             
-                    
                     $('mypage-email').innerText = state.user?.email || '---';
                     $('mypage-name-input').value = state.userName || '';
                     $('mypage-avatar').innerText = (state.userName || state.user?.email || '?').charAt(0).toUpperCase();
-                    
                     
                     $('mypage-accuracy').innerText = accuracy;
                     $('mypage-correct').innerText = totalCorrect;
@@ -875,7 +798,6 @@
                     
                     $('mypage-sessions').innerText = stats.sessionCount || 0;
             
-                    
                     const avgSpeed = totalAnswered > 0 ? (totalTimeSeconds / totalAnswered).toFixed(1) : 0;
                     const minSpeed = stats.minQuestionTime !== null && stats.minQuestionTime !== undefined ? stats.minQuestionTime.toFixed(1) : 0;
                     const maxSpeed = stats.maxQuestionTime ? stats.maxQuestionTime.toFixed(1) : 0;
@@ -884,7 +806,6 @@
                     $('mypage-speed-min').innerText = minSpeed;
                     $('mypage-speed-max').innerText = maxSpeed;
             
-                    
                     $('mypage-best-acc').innerText = stats.bestAccuracy || 0;
                     
                     if (stats.bestSessionTime !== null && stats.bestSessionTime !== undefined) {
@@ -907,14 +828,12 @@
                     if (targetQs.length === 0) return;
             
                     if (chapter) {
-                        
                         targetQs = targetQs.sort((a, b) => {
                             const orderA = a.order !== undefined ? a.order : 0;
                             const orderB = b.order !== undefined ? b.order : 0;
                             return orderA - orderB;
                         });
                     } else {
-                        
                         targetQs = targetQs.sort(() => Math.random() - 0.5);
                     }
             
@@ -957,13 +876,11 @@
                     $('quiz-score').innerText = q.score;
                     $('quiz-mistakes').innerText = q.mistakes.length;
                     
-                    
                     $('quiz-question-text').innerHTML = utils.formatMath(currentQ.q, currentQ.isMath);
                     
                     $('quiz-answer-input').value = '';
                     $('quiz-input-area').classList.remove('hidden');
                     $('quiz-feedback-area').classList.add('hidden');
-                    
                     
                     if (currentQ.isMath) {
                         $('math-keyboard').classList.remove('hidden');
@@ -985,8 +902,7 @@
                 checkStr: (input, answers) => {
                     const normalize = (str) => {
                         let s = str.toLowerCase().replace(/[\s　]/g, '').replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
-                        
-                        s = s.replace(/×/g, '*').replace(/÷/g, '/').replace(/[’'‘´`′]/g, "'");
+                        s = s.replace(/×/g, '*').replace(/÷/g, '/').replace(/['’‘´`′]/g, "'");
                         return s;
                     };
                     const normIn = normalize(input);
@@ -1004,14 +920,12 @@
                     const currentQ = state.quiz.questions[state.quiz.currentIndex];
                     const isCorrect = quizApp.checkStr(input, currentQ.a);
             
-                    
                     const qTimeSec = Math.max(1, Math.round((Date.now() - state.quiz.qStartTime) / 1000));
                     state.quiz.questionTimes.push(qTimeSec);
             
                     if (isCorrect) state.quiz.score++;
                     else state.quiz.mistakes.push(currentQ);
             
-                    
                     dataApp.recordQuestionLog(currentQ, isCorrect ? 'correct' : 'wrong', qTimeSec);
             
                     quizApp.showFeedback(isCorrect ? 'correct' : 'wrong', currentQ.a, currentQ.isMath);
@@ -1034,7 +948,6 @@
             
                     state.quiz.mistakes.push(currentQ);
             
-                    
                     dataApp.recordQuestionLog(currentQ, 'giveup', qTimeSec);
             
                     quizApp.showFeedback('giveup', currentQ.a, currentQ.isMath);
@@ -1052,7 +965,6 @@
                         header.innerHTML = `<span class="text-2xl md:text-3xl font-black text-gray-400">-</span><h3 class="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-gray-400">Give Up</h3>`;
                     }
             
-                    
                     $('quiz-feedback-answer').innerHTML = answers.map(ans => utils.formatMath(ans, isMath)).join(' / ');
                     $('quiz-feedback-area').classList.remove('hidden');
                     
@@ -1072,7 +984,6 @@
                 finish: () => {
                     const q = state.quiz;
                     q.durationSec = Math.floor((Date.now() - q.startTime) / 1000);
-                    
                     
                     dataApp.updateUserStats(q.score, q.questions.length, q.durationSec, q.questionTimes);
                     
@@ -1110,6 +1021,7 @@
             window.quizApp = quizApp;
             window.dataApp = dataApp;
             window.mathApp = mathApp;
+            window.state = state;
             
             window.onload = () => {
                 authApp.init();
